@@ -26,7 +26,7 @@ export interface User {
     Ab_key: string,
     Tmc_client_number: string,
     isEditing: boolean,
-    [key: string]: any;
+   
 }
 
 export interface userData {
@@ -44,7 +44,8 @@ export interface Country {
     ID: number;
     Name: string;
 }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type NewRowDataClone = User & { [key: string] : any };
 export const emptyUser: User = {
     ID: 0,
     Customer_name: "",

@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { getData, getCountries, getCurrencies, update, deleteUser, save } from "./api/customer";
 import { userData, User, Currency, Country, emptyUser } from './models/interfaces';
 import { columns } from "./models/struct";
+import TableSkeleton from './components/skeleton/tableSkeleton';
+import EditIcon from '../public/svg/edit';
+import DeleteIcon from '../public/svg/delete';
+import VisibleIcon from '../public/svg/visibile';
 
 
 function Table() {
@@ -16,7 +20,7 @@ function Table() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [newRowData, setNewRowData] = useState<User>(emptyUser);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
 
     getCurrencies().then((response) => {
@@ -47,6 +51,7 @@ function Table() {
 
       setNewData(initialNewData);
       // console.log('Data received:', response);
+      setLoading(false)
       setData(response.data);
     })
       .catch((error) => {
@@ -159,9 +164,9 @@ function Table() {
         });
     }
   };
-
+  if (loading) return <TableSkeleton row={10} />
   return (
-    <div className='flex overscroll-none justify-center items-center p-12'>
+    <div className='overscroll-none justify-center items-center p-12'>
       <div className="relative overflow-x-auto overscroll-none shadow-md sm:rounded-lg">
         <div className="flex items-center justify-between pb-4 bg-white p-4 dark:bg-gray-900">
           <div className='flex gap-4'>
@@ -217,6 +222,7 @@ function Table() {
                       id="checkbox-all-search"
                       type="checkbox"
                       checked={isCheckedAll}
+                      className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                       onChange={() => {
                         const updatedData = newData.map((user) => ({
                           ...user,
@@ -251,6 +257,7 @@ function Table() {
                         id={`checkbox-table-search-${newRowData?.ID}`}
                         type="checkbox"
                         checked={newData.find((user) => user.id === newRowData?.ID)?.isClicked || false}
+                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                         onChange={() => {
                           const updatedNewData = newData.map((user) =>
                             user.id === newRowData?.ID
@@ -266,7 +273,7 @@ function Table() {
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
                       {dropdownColumns.includes(column.key) ? (
-                        <select
+                        <select className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                           name={column.key}
                           value={newRowData[column.key as keyof User] as string}
                           onChange={(e) =>
@@ -292,11 +299,11 @@ function Table() {
                           type="text"
                           name={column.key}
                           value={newRowData[column.key as keyof User].toString()}
-                         
+
                           onChange={(e) =>
                             setNewRowData({ ...newRowData, [column.key]: e.target.value })
                           }
-                          className={"myClass " + (column.key == "ID" && ' max-w-xs')}
+                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
                         />
                       )}
                     </td>
@@ -331,6 +338,7 @@ function Table() {
                       <input
                         id={`checkbox-table-search-${item.ID}`}
                         type="checkbox"
+                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                         checked={(newData.find((user) => user.id === item.ID)?.isClicked || false) as boolean}
                         onChange={() => {
                           const updatedNewData = newData.map((user) =>
@@ -351,7 +359,7 @@ function Table() {
                         // Check if the column key is in the dropdownColumns array
                         dropdownColumns.includes(column.key) ? (
                           <select
-                          className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                             name={column.key}
                             value={item[column.key as keyof User] as string}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}
@@ -377,7 +385,7 @@ function Table() {
                             name={column.key}
                             value={item[column.key as keyof User].toString()}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}
-                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"+(column.key == "ID" && ' max-w-[4rem]')}
+                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
                           />
                         )
                       ) : (
@@ -396,27 +404,27 @@ function Table() {
                         >
                           Save
                         </button>
-                        
+
                       ) : (
                         <button
                           onClick={() => handleEdit(item.ID)}
                           className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         >
-                          Edit
+                          <EditIcon></EditIcon>
                         </button>
-                        
+
                       )}
                       <button
                         onClick={() => handleEdit(item.ID)}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       >
-                        visiblity
+                        <VisibleIcon />
                       </button>
                       <button
                         onClick={() => handleDelete(item.ID)}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       >
-                        delete
+                        <DeleteIcon />
                       </button>
                     </div>
 

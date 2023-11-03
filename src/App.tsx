@@ -1,10 +1,9 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
-import {getData, getCountries, getCurrencies, update, deleteUser, save} from "./api/customer";
-
+import { getData, getCountries, getCurrencies, update, deleteUser, save } from "./api/customer";
 import { userData, User, Currency, Country, emptyUser } from './models/interfaces';
-
 import { columns } from "./models/struct";
+
 
 function App() {
 
@@ -22,35 +21,35 @@ function App() {
   useEffect(() => {
 
     getCurrencies().then((response) => {
-        // Assuming the response is an array of currency objects with id and name properties
-        setCurrencies(response.data);
-      })
+      // Assuming the response is an array of currency objects with id and name properties
+      setCurrencies(response.data);
+    })
       .catch((error) => {
         console.error('Failed to fetch currency data:', error);
       });
 
     // Fetch country data
     getCountries().then((response) => {
-        // Assuming the response is an array of country objects with id and name properties
-        setCountries(response.data);
-      })
+      // Assuming the response is an array of country objects with id and name properties
+      setCountries(response.data);
+    })
       .catch((error) => {
         console.error('Failed to fetch country data:', error);
       });
 
     //setNewData(data)
     getData().then((response) => {
-        // Handle the response data
-        const initialNewData = response.data.map((item: User) => ({
-          id: item.ID,
-          isClicked: false,
-          isEditing: false,
-        }));
+      // Handle the response data
+      const initialNewData = response.data.map((item: User) => ({
+        id: item.ID,
+        isClicked: false,
+        isEditing: false,
+      }));
 
-        setNewData(initialNewData);
-        // console.log('Data received:', response);
-        setData(response.data);
-      })
+      setNewData(initialNewData);
+      // console.log('Data received:', response);
+      setData(response.data);
+    })
       .catch((error) => {
         console.error('API request failed:', error);
       });
@@ -62,9 +61,9 @@ function App() {
 
   const handleEdit = (userId: number): void => {
     setData((prevData) =>
-        prevData.map((user) =>
-            user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
-        )
+      prevData.map((user) =>
+        user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
+      )
     );
   };
 
@@ -92,22 +91,35 @@ function App() {
   };
 
   const handleAddRow = () => {
-    // Validate newRowData and handle any validation logic here
-    if (newRowData?.Customer_name && newRowData.Street) {
-      save(newRowData).then((response) => {
-        // Handle the response from the server, if needed
-        console.log('Data added:', response);
-        // Add the new data to local state if the API request was successful
-        setData((prevData) => [...prevData, newRowData]);
-        // Reset newRowData to clear the input fields
-        setNewRowData(emptyUser);
-      })
-          .catch((error) => {
-            console.error('Failed to add data:', error);
-          });
+    // Clone newRowData to avoid modifying the original state directly
+    const newRowDataClone: User = { ...newRowData };
+
+    // Iterate through the newRowDataClone object
+    for (const key in newRowDataClone) {
+      const column = columns.find((col) => col.key === key);
+      if (column && column.type === 'number') {
+        newRowDataClone[key] = parseInt(newRowDataClone[key] as string, 10); // Parse as an integer
+      }
+    }
+
+    // Validate newRowDataClone and handle any validation logic here
+    if (newRowDataClone?.Customer_name && newRowDataClone.Street) {
+      save(newRowDataClone)
+        .then((response) => {
+          // Handle the response from the server, if needed
+          console.log('Data added:', response);
+          // Add the new data to local state if the API request was successful
+          setData((prevData) => [...prevData, newRowDataClone]);
+          // Reset newRowData to clear the input fields
+          setNewRowData(emptyUser);
+        })
+        .catch((error) => {
+          console.error('Failed to add data:', error);
+        });
       setIsAdding(false);
     }
   };
+
 
   const handleEditUser = (userId: number): void => {
     const editedUser = data.find((user) => user.ID === userId);
@@ -117,9 +129,9 @@ function App() {
           // Handle the response from the server, if needed
           console.log('Data saved:', response);
           setData((prevData) =>
-              prevData.map((user) =>
-                  user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
-              )
+            prevData.map((user) =>
+              user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
+            )
           );
         })
         .catch((error) => {
@@ -164,7 +176,9 @@ function App() {
             </button>
             {/* ... */}
             {/* Delete Button here */}
-            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" onClick={() => deleteALl()} className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio"
+              // onClick={}
+              className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
 
               Delete
 
@@ -218,6 +232,7 @@ function App() {
                   </div>
                 </th>
                 {columns.map((column) => (
+                  // column.label !=== "Is Active"
                   <th scope="col" className="px-6 py-3" key={column.key}>
                     {column.label}
                   </th>
@@ -254,16 +269,28 @@ function App() {
                       {dropdownColumns.includes(column.key) ? (
                         <select
                           name={column.key}
-                          value={newRowData[column.key as keyof User]}
+                          value={newRowData[column.key as keyof User] as string}
                           onChange={(e) =>
                             setNewRowData({ ...newRowData, [column.key]: e.target.value })
                           }
                         >
-                          {/* ... Options for dropdown columns ... */}
+                          {column.key === 'Id_currency' ? (
+                            currencies.map((currency) => (
+                              <option key={currency.ID} value={currency.ID}>
+                                {`${currency.ID} - ${currency.Name}`}
+                              </option>
+                            ))
+                          ) : (
+                            countries.map((country) => (
+                              <option key={country.ID} value={country.ID}>
+                                {`${country.ID} - ${country.Name}`}
+                              </option>
+                            ))
+                          )}
                         </select>
                       ) : (
                         <input
-                          type="text"
+                          type={column.type}
                           name={column.key}
                           value={newRowData[column.key as keyof User].toString()}
                           onChange={(e) =>
@@ -274,6 +301,7 @@ function App() {
                       )}
                     </td>
                   ))}
+
                   <td
                     className={`${isHovered === newRowData?.ID
                       ? 'bg-gray-50 dark:bg-gray-600'
@@ -324,7 +352,7 @@ function App() {
                         dropdownColumns.includes(column.key) ? (
                           <select
                             name={column.key}
-                            value={item[column.key as keyof User]}
+                            value={item[column.key as keyof User] as string}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}
                           >
                             {column.key === 'Id_currency' ? (
@@ -344,7 +372,7 @@ function App() {
                         ) : (
                           // Render input fields for other columns
                           <input
-                            type="text"
+                            type={column.type}
                             name={column.key}
                             value={item[column.key as keyof User].toString()}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}

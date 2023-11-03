@@ -25,7 +25,8 @@ export interface User {
     Already_used: number,
     Ab_key: string,
     Tmc_client_number: string,
-    isEditing: boolean
+    isEditing: boolean,
+    [key: string]: any;
 }
 
 export interface userData {
@@ -38,7 +39,7 @@ export interface Currency {
     ID: number;
     Name: string;
 }
-  
+
 export interface Country {
     ID: number;
     Name: string;
@@ -73,3 +74,9 @@ export const emptyUser: User = {
     Tmc_client_number: "",
     isEditing: false
 };
+export type Column = {
+    key: keyof User;
+    label: string;
+    type: 'string' | 'number' | 'boolean'; // Specify the types for each column
+};
+

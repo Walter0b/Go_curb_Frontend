@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /*Start Animations*/
 @-webkit-keyframes animatetop {
 	from {
@@ -172,6 +173,4 @@
 		border-radius: 50%;
 	}
 }
-/*
--- End BackGround Animation 
-*/
+

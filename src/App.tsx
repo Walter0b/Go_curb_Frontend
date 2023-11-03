@@ -1,56 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
+import { userData, User, Currency, Country, emptyUser } from './types/interfaces';
+import { columns } from './structures/struct';
 
-interface User {
-  ID: number,
-  Customer_name: string,
-  Street: string,
-  City: string,
-  State: string,
-  Zip_code: string,
-  Notes: string,
-  Terms: number,
-  Account_number: string,
-  Tax_id: string,
-  Balance: string,
-  Is_active: boolean,
-  Is_sub_agency: boolean,
-  Language: string,
-  Slug: number,
-  Id_currency: number,
-  Id_country: number,
-  Irs_share_key: string,
-  Currency_rate: number,
-  Agency: string,
-  Avoid_deletion: boolean,
-  Is_editable: boolean,
-  Alias: string,
-  Already_used: number,
-  Ab_key: string,
-  Tmc_client_number: string,
-  isEditing: boolean
-}
-interface userData {
-  id: number;
-  isClicked: boolean;
-  isEditing: boolean;
-}
-interface Currency {
-  ID: number;
-  Name: string;
-}
-
-interface Country {
-  ID: number;
-  Name: string;
-}
 
 
 function App() {
 
   const [newData, setNewData] = useState<userData[]>([]);
   const dropdownColumns = ['Id_currency', 'Id_country'];
+  const [inputData, setInputData] = useState<User>();
+  const [isAdding, setIsAdding] = useState(false);
+
+
+  const handleAdd = (): void => {
+    setAdding(true);
+  };
 
   useEffect(() => {
     axios.get('http://localhost:8080/Currencies')
@@ -75,11 +41,12 @@ function App() {
     axios.get('http://localhost:8080')
       .then((response) => {
         // Handle the response data
-        const initialNewData = response.data.map((item: { id: string }) => ({
-          id: item.id,
+        const initialNewData = response.data.map((item: User) => ({
+          id: item.ID,
           isClicked: false,
           isEditing: false,
         }));
+
         setNewData(initialNewData);
         // console.log('Data received:', response);
         setData(response.data);
@@ -96,36 +63,8 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  // console.log(currencies)
+  const [newRowData, setNewRowData] = useState<User>(emptyUser);
 
-  const columns = [
-    { key: 'ID', label: 'id' },
-    { key: 'Customer_name', label: 'Name' },
-    { key: 'Street', label: 'Street' },
-    { key: 'City', label: 'City' },
-    { key: 'State', label: 'State' },
-    { key: 'Zip_code', label: 'Zip Code' },
-    { key: 'Notes', label: 'Notes' },
-    { key: 'Terms', label: 'Terms' },
-    { key: 'Account_number', label: 'Account Number' },
-    { key: 'Tax_id', label: 'Tax ID' },
-    { key: 'Balance', label: 'Balance' },
-    { key: 'Is_active', label: 'Is Active' },
-    { key: 'Is_sub_agency', label: 'Is Sub Agency' },
-    { key: 'Language', label: 'Language' },
-    { key: 'Slug', label: 'Slug' },
-    { key: 'Id_currency', label: 'Currency ID' },
-    { key: 'Id_country', label: 'Country ID' },
-    { key: 'Irs_share_key', label: 'IRS Share Key' },
-    { key: 'Currency_rate', label: 'Currency Rate' },
-    { key: 'Agency', label: 'Agency' },
-    { key: 'Avoid_deletion', label: 'Avoid Deletion' },
-    { key: 'Is_editable', label: 'Is Editable' },
-    { key: 'Alias', label: 'Alias' },
-    { key: 'Already_used', label: 'Already Used' },
-    { key: 'Ab_key', label: 'AB Key' },
-    { key: 'Tmc_client_number', label: 'TMC Client Number' },
-  ];
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -152,6 +91,39 @@ function App() {
     );
   };
 
+  const handleAddClick = () => {
+    setIsAdding(true);
+  };
+
+  const handleCancelClick = () => {
+    setIsAdding(false);
+    // Clear the input fields
+    setNewRowData(emptyUser);
+  };
+
+  const handleAddRow = () => {
+    // Validate newRowData and handle any validation logic here
+    if (newRowData?.Customer_name && newRowData.Street) {
+      axios
+        .post('http://localhost:8080/customers', newRowData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((response) => {
+          // Handle the response from the server, if needed
+          console.log('Data added:', response);
+          // Add the new data to local state if the API request was successful
+          setData((prevData) => [...prevData, newRowData]);
+          // Reset newRowData to clear the input fields
+          setNewRowData(emptyUser);
+        })
+        .catch((error) => {
+          console.error('Failed to add data:', error);
+        });
+      setIsAdding(false);
+    }
+  };
 
   const handleSave = (userId: number): void => {
     const editedUser = data.find((user) => user.ID === userId);
@@ -200,7 +172,6 @@ function App() {
           console.error('Failed to save data:', error);
         });
 
-      // You can also update the user's edit mode after successfully saving the data
       handleEdit(userId);
     }
   };
@@ -212,9 +183,16 @@ function App() {
   const handleDelete = (userId: number): void => {
     const deleteUser = data.find((user) => user.ID === userId);
     if (deleteUser) {
-      axios.delete(`http://localhost:8080/customer/${deleteUser.ID}`)
+      axios
+        .delete(`http://localhost:8080/customer/${deleteUser.ID}`)
         .then((response) => {
           console.log('Data deleted:', response);
+
+          // Filter the data to exclude the deleted user
+          const updatedData = data.filter((user) => user.ID !== userId);
+
+          // Update the state variable with the filtered data
+          setData(updatedData);
         })
         .catch((error) => {
           console.error('Failed to delete data:', error);
@@ -222,12 +200,34 @@ function App() {
     }
   };
 
+  console.log(newData)
   return (
     <div className='flex overscroll-none justify-center items-center p-12'>
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <div className="flex items-center justify-between pb-4 bg-white p-4 dark:bg-gray-900">
           <div className='flex gap-4'>
             {/* Buttons and dropdowns here */}
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+
+              Last 30 days
+              <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+              </svg>
+            </button>
+            {/* ... */}
+            {/* Delete Button here */}
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" onClick={() => deleteALl()} className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+
+              Delete
+
+            </button>
+            {/* ... */}
+            {/* Add Customer Button here */}
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" onClick={handleAddClick} className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+
+              Add Customer
+
+            </button>
             {/* ... */}
           </div>
           {/* Search here */}
@@ -257,15 +257,15 @@ function App() {
                       type="checkbox"
                       checked={isCheckedAll}
                       onChange={() => {
+                        const updatedData = newData.map((user) => ({
+                          ...user,
+                          isClicked: !isCheckedAll,
+                        }));
+                        setNewData(updatedData);
                         setCheckedAll(!isCheckedAll);
-                        setData((prevData) =>
-                          prevData.map((user) => ({
-                            ...user,
-                            isChecked: !isCheckedAll,
-                          }))
-                        );
                       }}
                     />
+
                     <label className="sr-only">checkbox</label>
                   </div>
                 </th>
@@ -281,6 +281,68 @@ function App() {
             </thead>
             <tbody className=''>
               {/* Table content */}
+              {isAdding && (
+                <tr className={`bg-white dark:bg-gray-800 border-b dark:border-gray-700`}>
+                  <td className="w-4 p-4">
+                    <div className="flex items-center">
+                      <input
+                        id={`checkbox-table-search-${newRowData?.ID}`}
+                        type="checkbox"
+                        checked={newData.find((user) => user.id === newRowData?.ID)?.isClicked || false}
+                        onChange={() => {
+                          const updatedNewData = newData.map((user) =>
+                            user.id === newRowData?.ID
+                              ? { ...user, isClicked: !(user.isClicked || false) }
+                              : user
+                          );
+                          setNewData(updatedNewData);
+                        }}
+                      />
+                      <label className="sr-only">checkbox</label>
+                    </div>
+                  </td>
+                  {columns.map((column) => (
+                    <td className="px-6 py-4" key={column.key}>
+                      {dropdownColumns.includes(column.key) ? (
+                        <select
+                          name={column.key}
+                          value={newRowData[column.key as keyof User]}
+                          onChange={(e) =>
+                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                          }
+                        >
+                          {/* ... Options for dropdown columns ... */}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name={column.key}
+                          value={newRowData[column.key as keyof User].toString()}
+                          onChange={(e) =>
+                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                          }
+                          className=""
+                        />
+                      )}
+                    </td>
+                  ))}
+                  <td
+                    className={`${isHovered === newRowData?.ID
+                      ? 'bg-gray-50 dark:bg-gray-600'
+                      : 'bg-white dark:bg-gray-800'
+                      } border-b dark:!border-gray-700 px-6 py-4 sticky right-0  border-gray-300  `}
+                  >
+                    <div className='flex gap-4 '>
+                      <button onClick={handleAddRow} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                        Add
+                      </button>
+                      <button onClick={handleCancelClick} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {filteredData.map((item: User) => (
                 <tr
                   key={item.ID}

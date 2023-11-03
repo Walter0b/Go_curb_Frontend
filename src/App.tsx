@@ -1,26 +1,27 @@
-import React, { useEffect, useState } from 'react';
 import './App.css';
-import axios from 'axios';
-import { userData, User, Currency, Country, emptyUser } from './types/interfaces';
-import { columns } from './structures/struct';
+import React, { useEffect, useState } from 'react';
+import {getData, getCountries, getCurrencies, update, deleteUser, save} from "./api/customer";
 
+import { userData, User, Currency, Country, emptyUser } from './models/interfaces';
 
+import { columns } from "./models/struct";
 
 function App() {
 
   const [newData, setNewData] = useState<userData[]>([]);
   const dropdownColumns = ['Id_currency', 'Id_country'];
-  const [inputData, setInputData] = useState<User>();
   const [isAdding, setIsAdding] = useState(false);
-
-
-  const handleAdd = (): void => {
-    setAdding(true);
-  };
+  const [data, setData] = useState<User[]>([]);
+  const [isCheckedAll, setCheckedAll] = useState(false);
+  const [isHovered, setHovered] = useState<number>(0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [newRowData, setNewRowData] = useState<User>(emptyUser);
 
   useEffect(() => {
-    axios.get('http://localhost:8080/Currencies')
-      .then((response) => {
+
+    getCurrencies().then((response) => {
         // Assuming the response is an array of currency objects with id and name properties
         setCurrencies(response.data);
       })
@@ -29,8 +30,7 @@ function App() {
       });
 
     // Fetch country data
-    axios.get('http://localhost:8080/Countries')
-      .then((response) => {
+    getCountries().then((response) => {
         // Assuming the response is an array of country objects with id and name properties
         setCountries(response.data);
       })
@@ -38,8 +38,8 @@ function App() {
         console.error('Failed to fetch country data:', error);
       });
 
-    axios.get('http://localhost:8080')
-      .then((response) => {
+    //setNewData(data)
+    getData().then((response) => {
         // Handle the response data
         const initialNewData = response.data.map((item: User) => ({
           id: item.ID,
@@ -56,25 +56,15 @@ function App() {
       });
   }, []);
 
-  const [data, setData] = useState<User[]>([]);
-
-  const [isCheckedAll, setCheckedAll] = useState(false);
-  const [isHovered, setHovered] = useState<number>(0);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [newRowData, setNewRowData] = useState<User>(emptyUser);
-
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   const handleEdit = (userId: number): void => {
     setData((prevData) =>
-      prevData.map((user) =>
-        user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
-      )
+        prevData.map((user) =>
+            user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
+        )
     );
   };
 
@@ -104,75 +94,37 @@ function App() {
   const handleAddRow = () => {
     // Validate newRowData and handle any validation logic here
     if (newRowData?.Customer_name && newRowData.Street) {
-      axios
-        .post('http://localhost:8080/customers', newRowData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        .then((response) => {
-          // Handle the response from the server, if needed
-          console.log('Data added:', response);
-          // Add the new data to local state if the API request was successful
-          setData((prevData) => [...prevData, newRowData]);
-          // Reset newRowData to clear the input fields
-          setNewRowData(emptyUser);
-        })
-        .catch((error) => {
-          console.error('Failed to add data:', error);
-        });
+      save(newRowData).then((response) => {
+        // Handle the response from the server, if needed
+        console.log('Data added:', response);
+        // Add the new data to local state if the API request was successful
+        setData((prevData) => [...prevData, newRowData]);
+        // Reset newRowData to clear the input fields
+        setNewRowData(emptyUser);
+      })
+          .catch((error) => {
+            console.error('Failed to add data:', error);
+          });
       setIsAdding(false);
     }
   };
 
-  const handleSave = (userId: number): void => {
+  const handleEditUser = (userId: number): void => {
     const editedUser = data.find((user) => user.ID === userId);
     if (editedUser) {
-      const editedData = {
-        id: editedUser.ID,
-        customer_name: editedUser.Customer_name,
-        street: editedUser.Street,
-        city: editedUser.City,
-        state: editedUser.State,
-        zip_code: editedUser.Zip_code,
-        notes: editedUser.Notes,
-        terms: editedUser.Terms,
-        account_number: editedUser.Account_number,
-        tax_id: editedUser.Tax_id,
-        balance: editedUser.Balance,
-        is_active: editedUser.Is_active,
-        is_sub_agency: editedUser.Is_sub_agency,
-        Language: editedUser.Language,
-        slug: editedUser.Slug,
-        id_currency: editedUser.Id_currency,
-        id_country: editedUser.Id_country,
-        irs_share_key: editedUser.Irs_share_key,
-        currency_rate: editedUser.Currency_rate,
-        agency: editedUser.Agency,
-        avoid_deletion: editedUser.Avoid_deletion,
-        is_editable: editedUser.Is_editable,
-        alias: editedUser.Alias,
-        already_used: editedUser.Already_used,
-        ab_key: editedUser.Ab_key,
-        tmc_client_number: editedUser.Tmc_client_number,
-
-      };
-
-      axios
-        .put(`http://localhost:8080/customer?id=${editedUser.ID}`, editedData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
+      update(editedUser)
         .then((response) => {
           // Handle the response from the server, if needed
           console.log('Data saved:', response);
+          setData((prevData) =>
+              prevData.map((user) =>
+                  user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
+              )
+          );
         })
         .catch((error) => {
           console.error('Failed to save data:', error);
         });
-
-      handleEdit(userId);
     }
   };
 
@@ -181,16 +133,13 @@ function App() {
   );
 
   const handleDelete = (userId: number): void => {
-    const deleteUser = data.find((user) => user.ID === userId);
-    if (deleteUser) {
-      axios
-        .delete(`http://localhost:8080/customer/${deleteUser.ID}`)
+    const user = data.find((user) => user.ID === userId);
+    if (user) {
+      deleteUser(user)
         .then((response) => {
           console.log('Data deleted:', response);
-
           // Filter the data to exclude the deleted user
           const updatedData = data.filter((user) => user.ID !== userId);
-
           // Update the state variable with the filtered data
           setData(updatedData);
         })
@@ -200,10 +149,9 @@ function App() {
     }
   };
 
-  console.log(newData)
   return (
     <div className='flex overscroll-none justify-center items-center p-12'>
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative overflow-x-auto overscroll-none shadow-md sm:rounded-lg">
         <div className="flex items-center justify-between pb-4 bg-white p-4 dark:bg-gray-900">
           <div className='flex gap-4'>
             {/* Buttons and dropdowns here */}
@@ -414,7 +362,7 @@ function App() {
                     <div className='flex gap-4 '>
                       {item.isEditing ? (
                         <button
-                          onClick={() => handleSave(item.ID)}
+                          onClick={() => handleEditUser(item.ID)}
                           className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         >
                           Save

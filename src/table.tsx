@@ -20,7 +20,7 @@ function Table() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [newRowData, setNewRowData] = useState<User>(emptyUser);
-  
+
   const [loading, setLoading] = useState(true);
   useEffect(() => {
 
@@ -165,6 +165,8 @@ function Table() {
         });
     }
   };
+
+
   if (loading) return <TableSkeleton row={10} />
   return (
     <div className='overscroll-none justify-center items-center p-12'>
@@ -273,34 +275,23 @@ function Table() {
                   </td>
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
-                      {dropdownColumns.includes(column.key) ? (
-                        <select className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
+                      {column.type === 'boolean' ? (
+                        <select
+                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                           name={column.key}
-                          value={newRowData[column.key as keyof User] as string}
+                          value={newRowData[column.key as keyof User].toString()}
                           onChange={(e) =>
                             setNewRowData({ ...newRowData, [column.key]: e.target.value })
                           }
                         >
-                          {column.key === 'Id_currency' ? (
-                            currencies.map((currency) => (
-                              <option key={currency.ID} value={currency.ID}>
-                                {`${currency.ID} - ${currency.Name}`}
-                              </option>
-                            ))
-                          ) : (
-                            countries.map((country) => (
-                              <option key={country.ID} value={country.ID}>
-                                {`${country.ID} - ${country.Name}`}
-                              </option>
-                            ))
-                          )}
+                          <option value="true">True</option>
+                          <option value="false">False</option>
                         </select>
                       ) : (
                         <input
-                          type="text"
+                          type={column.type}
                           name={column.key}
                           value={newRowData[column.key as keyof User].toString()}
-
                           onChange={(e) =>
                             setNewRowData({ ...newRowData, [column.key]: e.target.value })
                           }
@@ -309,6 +300,7 @@ function Table() {
                       )}
                     </td>
                   ))}
+
 
                   <td
                     className={`${isHovered === newRowData?.ID
@@ -357,44 +349,32 @@ function Table() {
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
                       {item.isEditing ? (
-                        // Check if the column key is in the dropdownColumns array
-                        dropdownColumns.includes(column.key) ? (
+                        column.type === 'boolean' ? (
                           <select
-                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            name={column.key}
-                            value={item[column.key as keyof User] as string}
-                            onChange={(e) => handleInputChange(e, item.ID, column.key)}
-                          >
-                            {column.key === 'Id_currency' ? (
-                              currencies.map((currency) => (
-                                <option key={currency.ID} value={currency.ID}>
-                                  {`${currency.ID} - ${currency.Name}`}
-                                </option>
-                              ))
-                            ) : (
-                              countries.map((country) => (
-                                <option key={country.ID} value={country.ID}>
-                                  {`${country.ID} - ${country.Name}`}
-                                </option>
-                              ))
-                            )}
-                          </select>
-                        ) : (
-                          // Render input fields for other columns
-                          <input
-                            type="text"
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                             name={column.key}
                             value={item[column.key as keyof User].toString()}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}
-                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
+                          >
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                          </select>
+                        ) : (
+                          <input
+                            type={column.type}
+                            name={column.key}
+                            value={item[column.key as keyof User].toString()}
+                            onChange={(e) => handleInputChange(e, item.ID, column.key)}
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           />
                         )
                       ) : (
-                        // Display the selected value for non-dropdown columns
+                        // Display the selected value for non-editing mode
                         item[column.key as keyof User]
                       )}
                     </td>
                   ))}
+
                   <td className={`${isHovered === item.ID ? 'bg-gray-50 dark:bg-gray-600' : 'bg-white dark:bg-gray-800'
                     } border-b dark:!border-gray-700 px-6 py-4 sticky right-0  border-gray-300  `}>
                     <div className='flex gap-4 '>

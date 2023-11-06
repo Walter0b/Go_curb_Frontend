@@ -16,29 +16,29 @@ function Table() {
   const [isCheckedAll, setCheckedAll] = useState(false);
   const [isHovered, setHovered] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
+  // const [currencies, setCurrencies] = useState<Currency[]>([]);
+  // const [countries, setCountries] = useState<Country[]>([]);
   const [newRowData, setNewRowData] = useState<User>(emptyUser);
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
 
-    getCurrencies().then((response) => {
-      // Assuming the response is an array of currency objects with id and name properties
-      setCurrencies(response.data);
-    })
-      .catch((error) => {
-        console.error('Failed to fetch currency data:', error);
-      });
+    // getCurrencies().then((response) => {
+    //   // Assuming the response is an array of currency objects with id and name properties
+    //   setCurrencies(response.data);
+    // })
+    //   .catch((error) => {
+    //     console.error('Failed to fetch currency data:', error);
+    //   });
 
     // Fetch country data
-    getCountries().then((response) => {
-      // Assuming the response is an array of country objects with id and name properties
-      setCountries(response.data);
-    })
-      .catch((error) => {
-        console.error('Failed to fetch country data:', error);
-      });
+    // getCountries().then((response) => {
+    //   // Assuming the response is an array of country objects with id and name properties
+    //   setCountries(response.data);
+    // })
+    // .catch((error) => {
+    //   console.error('Failed to fetch country data:', error);
+    // });
 
     //setNewData(data)
     getData().then((response) => {
@@ -82,6 +82,7 @@ function Table() {
         user.ID === userId ? { ...user, [key]: value } : user
       )
     );
+
   };
 
   const handleAddClick = () => {
@@ -134,7 +135,7 @@ function Table() {
           console.log('Data saved:', response);
           setData((prevData) =>
             prevData.map((user) =>
-              user.ID === userId ? { ...user, isEditing: !user.isEditing } : user
+              user.ID === userId ? { ...user, isEditing: false } : user // Set isEditing to false
             )
           );
         })
@@ -143,6 +144,7 @@ function Table() {
         });
     }
   };
+
 
   const filteredData = data.filter((item) =>
     item.Customer_name.toLowerCase().includes(searchTerm.toLowerCase())

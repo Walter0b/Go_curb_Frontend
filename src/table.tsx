@@ -16,29 +16,29 @@ function Table() {
   const [isCheckedAll, setCheckedAll] = useState(false);
   const [isHovered, setHovered] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState('');
-  // const [currencies, setCurrencies] = useState<Currency[]>([]);
-  // const [countries, setCountries] = useState<Country[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
   const [newRowData, setNewRowData] = useState<User>(emptyUser);
-
+  const dropdownColumns = ['Id_currency', 'Id_country'];
   const [loading, setLoading] = useState(true);
   useEffect(() => {
 
-    // getCurrencies().then((response) => {
-    //   // Assuming the response is an array of currency objects with id and name properties
-    //   setCurrencies(response.data);
-    // })
-    //   .catch((error) => {
-    //     console.error('Failed to fetch currency data:', error);
-    //   });
+    getCurrencies().then((response) => {
+      // Assuming the response is an array of currency objects with id and name properties
+      setCurrencies(response.data);
+    })
+      .catch((error) => {
+        console.error('Failed to fetch currency data:', error);
+      });
 
     // Fetch country data
-    // getCountries().then((response) => {
-    //   // Assuming the response is an array of country objects with id and name properties
-    //   setCountries(response.data);
-    // })
-    // .catch((error) => {
-    //   console.error('Failed to fetch country data:', error);
-    // });
+    getCountries().then((response) => {
+      // Assuming the response is an array of country objects with id and name properties
+      setCountries(response.data);
+    })
+      .catch((error) => {
+        console.error('Failed to fetch country data:', error);
+      });
 
     //setNewData(data)
     getData().then((response) => {
@@ -276,29 +276,62 @@ function Table() {
                   </td>
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
-                      {column.type === 'boolean' ? (
-                        <select
-                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.type == "boolean" && ' max-w-[4rem]')}
+                      {dropdownColumns.includes(column.key) ? (
+                        <select className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
                           name={column.key}
-                          value={newRowData[column.key as keyof User].toString()}
+                          value={newRowData[column.key as keyof User] as string}
                           onChange={(e) =>
                             setNewRowData({ ...newRowData, [column.key]: e.target.value })
                           }
                         >
-                          <option value="true">True</option>
-                          <option value="false">False</option>
+                          {column.key === 'Id_currency' ? (
+                            currencies.map((currency) => (
+                              <option key={currency.ID} value={currency.ID}>
+                                {`${currency.ID} - ${currency.Name}`}
+                              </option>
+                            ))
+                          ) : (
+                            countries.map((country) => (
+                              <option key={country.ID} value={country.ID}>
+                                {`${country.ID} - ${country.Name}`}
+                              </option>
+                            ))
+                          )}
                         </select>
-                      ) : (
-                        <input
-                          type={column.type}
-                          name={column.key}
-                          value={newRowData[column.key as keyof User].toString()}
-                          onChange={(e) =>
-                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
-                          }
-                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
-                        />
-                      )}
+                      ) :
+                        column.type === 'boolean' ? (
+                          <select
+                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.type == "boolean" && ' max-w-[4rem]')}
+                            name={column.key}
+                            value={newRowData[column.key as keyof User].toString()}
+                            onChange={(e) =>
+                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                            }
+                          >
+                            <option value="true">True</option>
+                            <option value="false">False</option>
+                          </select>
+                        ) : dropdownColumns.includes(column.key) ? (
+                          <select
+                            name={column.key}
+                            value={newRowData[column.key as keyof User] as string}
+                            onChange={(e) =>
+                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                            }
+                          >
+                            [{ }]
+                          </select>
+                        ) : (
+                          <input
+                            type={column.type}
+                            name={column.key}
+                            value={newRowData[column.key as keyof User].toString()}
+                            onChange={(e) =>
+                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                            }
+                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
+                          />
+                        )}
                     </td>
                   ))}
 
@@ -350,25 +383,47 @@ function Table() {
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
                       {item.isEditing ? (
-                        column.type === 'boolean' ? (
+                        dropdownColumns.includes(column.key) ? (
                           <select
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                             name={column.key}
-                            value={item[column.key as keyof User].toString()}
+                            value={item[column.key as keyof User] as string}
                             onChange={(e) => handleInputChange(e, item.ID, column.key)}
                           >
-                            <option value="true">True</option>
-                            <option value="false">False</option>
+                            {column.key === 'Id_currency' ? (
+                              currencies.map((currency) => (
+                                <option key={currency.ID} value={currency.ID}>
+                                  {`${currency.ID} - ${currency.Name}`}
+                                </option>
+                              ))
+                            ) : (
+                              countries.map((country) => (
+                                <option key={country.ID} value={country.ID}>
+                                  {`${country.ID} - ${country.Name}`}
+                                </option>
+                              ))
+                            )}
                           </select>
-                        ) : (
-                          <input
-                            type={column.type}
-                            name={column.key}
-                            value={item[column.key as keyof User].toString()}
-                            onChange={(e) => handleInputChange(e, item.ID, column.key)}
-                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
-                          />
-                        )
+                        ) :
+                          column.type === 'boolean' ? (
+                            <select
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              name={column.key}
+                              value={item[column.key as keyof User].toString()}
+                              onChange={(e) => handleInputChange(e, item.ID, column.key)}
+                            >
+                              <option value="true">True</option>
+                              <option value="false">False</option>
+                            </select>
+                          ) : (
+                            <input
+                              type={column.type}
+                              name={column.key}
+                              value={item[column.key as keyof User].toString()}
+                              onChange={(e) => handleInputChange(e, item.ID, column.key)}
+                              className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
+                            />
+                          )
                       ) : (
                         // Display the selected value for non-editing mode
                         item[column.key as keyof User]

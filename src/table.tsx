@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getData, getCountries, getCurrencies, update, deleteUser, save } from "./api/customer";
-import { userData, User, Currency, Country, emptyUser } from './models/interfaces';
+import { UserData, User, Currency, Country, emptyUser, NewRowDataClone } from './models/interfaces';
 import { columns } from "./models/struct";
 import TableSkeleton from './components/skeleton/tableSkeleton';
 import EditIcon from '../public/svg/edit';
@@ -10,7 +10,7 @@ import VisibleIcon from '../public/svg/visibile';
 
 function Table() {
 
-  const [newData, setNewData] = useState<userData[]>([]);
+  const [newData, setNewData] = useState<UserData[]>([]);
   const dropdownColumns = ['Id_currency', 'Id_country'];
   const [isAdding, setIsAdding] = useState(false);
   const [data, setData] = useState<User[]>([]);
@@ -20,6 +20,7 @@ function Table() {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [newRowData, setNewRowData] = useState<User>(emptyUser);
+  
   const [loading, setLoading] = useState(true);
   useEffect(() => {
 
@@ -96,7 +97,7 @@ function Table() {
 
   const handleAddRow = () => {
     // Clone newRowData to avoid modifying the original state directly
-    const newRowDataClone: User = { ...newRowData };
+    const newRowDataClone: NewRowDataClone = { ...newRowData };
 
     // Iterate through the newRowDataClone object
     for (const key in newRowDataClone) {

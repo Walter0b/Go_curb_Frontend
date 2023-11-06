@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
     ID: number,
     Customer_name: string,
     Street: string,
@@ -26,10 +26,10 @@ export interface User {
     Ab_key: string,
     Tmc_client_number: string,
     isEditing: boolean,
-   
+
 }
 
-export interface userData {
+export interface UserData {
     id: number;
     isClicked: boolean;
     isEditing: boolean;
@@ -45,7 +45,8 @@ export interface Country {
     Name: string;
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type NewRowDataClone = User & { [key: string] : any };
+export type NewRowDataClone = User & { [key: string]: string | number | boolean };
+
 export const emptyUser: User = {
     ID: 0,
     Customer_name: "",

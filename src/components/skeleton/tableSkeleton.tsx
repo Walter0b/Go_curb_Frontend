@@ -1,4 +1,3 @@
-import React from 'react';
 
 const TableSkeleton = ({ row }: { row: number }) => {
   const rows = [];

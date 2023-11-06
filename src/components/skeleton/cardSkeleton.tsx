@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CardSkeleton = ({ number }: { number: number }) => {
   const skeletonCards = Array.from({ length: number }, (_, index) => (
     <div

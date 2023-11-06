@@ -1,21 +1,23 @@
 import axios from 'axios'
 import { User } from '../models/interfaces';
 
+
+const url = import.meta.env.VITE_URL
 export function getData() {
-    return axios.get('http://localhost:8080');
+    return axios.get(url);
 }
 
 export function getCountries() {
-    return axios.get('http://localhost:8080/Countries')
+    return axios.get('${url}/Countries')
 }
 
 export function getCurrencies() {
-    return axios.get('http://localhost:8080/Currencies')
+    return axios.get('${url}/Currencies')
 }
 
 export function save(newRowData: User) {
     return axios
-        .post('http://localhost:8080/customers', newRowData, {
+        .post('${url}/customers', newRowData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -53,7 +55,7 @@ export function update(editedUser: User) {
     };
 
     return axios
-        .put(`http://localhost:8080/customer?id=${editedUser.ID}`, editedData, {
+        .put(`${url}/customer?id=${editedUser.ID}`, editedData, {
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -61,5 +63,5 @@ export function update(editedUser: User) {
 }
 
 export function deleteUser(customer: User) {
-    return axios.delete(`http://localhost:8080/customer/${customer.ID}`);
+    return axios.delete(`${url}/customer/${customer.ID}`);
 }

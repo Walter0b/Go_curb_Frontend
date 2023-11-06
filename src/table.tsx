@@ -5,7 +5,7 @@ import { columns } from "./models/struct";
 import TableSkeleton from './components/skeleton/tableSkeleton';
 import EditIcon from '../public/svg/edit';
 import DeleteIcon from '../public/svg/delete';
-import VisibleIcon from '../public/svg/visibile';
+import VisibleIcon from '../public/svg/visible';
 
 
 function Table() {

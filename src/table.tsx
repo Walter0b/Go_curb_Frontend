@@ -5,7 +5,8 @@ import { columns } from "./models/struct";
 import TableSkeleton from './components/skeleton/tableSkeleton';
 import EditIcon from '../public/svg/edit';
 import DeleteIcon from '../public/svg/delete';
-import VisibleIcon from '../public/svg/visible';
+import './table.css'
+// import VisibleIcon from '../public/svg/visible';
 
 
 function Table() {
@@ -18,8 +19,13 @@ function Table() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [newRowData, setNewRowData] = useState<User>(emptyUser);
-  const dropdownColumns = ['Id_currency', 'Id_country'];
+  const [newRowData, setNewRowData] = useState<User>({
+    ...emptyUser,
+    Id_currency: currencies[0]?.ID,
+    Id_country: currencies[0]?.ID,
+    Language: 'en',
+  });
+  const dropdownColumns = ['Id_currency', 'Id_country', 'Language'];
   const [loading, setLoading] = useState(true);
   useEffect(() => {
 
@@ -98,12 +104,15 @@ function Table() {
   const handleAddRow = () => {
     // Clone newRowData to avoid modifying the original state directly
     const newRowDataClone: NewRowDataClone = { ...newRowData };
-
+    console.log(newRowDataClone.Language)
     // Iterate through the newRowDataClone object
     for (const key in newRowDataClone) {
       const column = columns.find((col) => col.key === key);
       if (column && column.type === 'number') {
         newRowDataClone[key] = parseInt(newRowDataClone[key] as string, 10); // Parse as an integer
+      }
+      if (column && column.type === 'boolean') {
+        newRowDataClone[key] = (newRowDataClone[key] === 'true'); // Parse as an integer
       }
     }
 
@@ -121,21 +130,26 @@ function Table() {
         .catch((error) => {
           console.error('Failed to add data:', error);
         });
+
       setIsAdding(false);
     }
   };
 
 
+
   const handleEditUser = (userId: number): void => {
     const editedUser = data.find((user) => user.ID === userId);
     if (editedUser) {
+      // Include the selected language value in the edited user object
+      editedUser.Language = newRowData.Language;
+
       update(editedUser)
         .then((response) => {
           // Handle the response from the server, if needed
           console.log('Data saved:', response);
           setData((prevData) =>
             prevData.map((user) =>
-              user.ID === userId ? { ...user, isEditing: false } : user // Set isEditing to false
+              user.ID === userId ? { ...user, isEditing: false } : user
             )
           );
         })
@@ -144,6 +158,7 @@ function Table() {
         });
     }
   };
+
 
 
   const filteredData = data.filter((item) =>
@@ -251,17 +266,19 @@ function Table() {
                 </th>
               </tr>
             </thead>
-            <tbody className=''>
+            <tbody className=' '>
               {/* Table content */}
               {isAdding && (
-                <tr className={`bg-white dark:bg-gray-800 border-b dark:border-gray-700`}>
+                <tr className={`bg-white dark:bg-gray-800 border-b transition-c-0.5 dark:border-gray-700`}>
+                  {/* all table checkbox */}
                   <td className="w-4 p-4">
                     <div className="flex items-center">
+
                       <input
                         id={`checkbox-table-search-${newRowData?.ID}`}
                         type="checkbox"
                         checked={newData.find((user) => user.id === newRowData?.ID)?.isClicked || false}
-                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
+                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "}
                         onChange={() => {
                           const updatedNewData = newData.map((user) =>
                             user.id === newRowData?.ID
@@ -274,15 +291,17 @@ function Table() {
                       <label className="sr-only">checkbox</label>
                     </div>
                   </td>
+                  {/* all table checkbox */}
                   {columns.map((column) => (
                     <td className="px-6 py-4" key={column.key}>
                       {dropdownColumns.includes(column.key) ? (
-                        <select className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
-                          name={column.key}
+                        <select
+                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "}
                           value={newRowData[column.key as keyof User] as string}
-                          onChange={(e) =>
-                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
-                          }
+                          onChange={(e) => {
+                            const selectedValue = e.target.value;
+                            setNewRowData({ ...newRowData, [column.key]: selectedValue });
+                          }}
                         >
                           {column.key === 'Id_currency' ? (
                             currencies.map((currency) => (
@@ -290,6 +309,12 @@ function Table() {
                                 {`${currency.ID} - ${currency.Name}`}
                               </option>
                             ))
+                          ) : column.key === 'Language' ? (
+                            // For the "Language" column
+                            <>
+                              <option value="en">English</option>
+                              <option value="fr">French</option>
+                            </>
                           ) : (
                             countries.map((country) => (
                               <option key={country.ID} value={country.ID}>
@@ -298,43 +323,31 @@ function Table() {
                             ))
                           )}
                         </select>
-                      ) :
-                        column.type === 'boolean' ? (
-                          <select
-                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.type == "boolean" && ' max-w-[4rem]')}
-                            name={column.key}
-                            value={newRowData[column.key as keyof User].toString()}
-                            onChange={(e) =>
-                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
-                            }
-                          >
-                            <option value="true">True</option>
-                            <option value="false">False</option>
-                          </select>
-                        ) : dropdownColumns.includes(column.key) ? (
-                          <select
-                            name={column.key}
-                            value={newRowData[column.key as keyof User] as string}
-                            onChange={(e) =>
-                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
-                            }
-                          >
-                            [{ }]
-                          </select>
-                        ) : (
-                          <input
-                            type={column.type}
-                            name={column.key}
-                            value={newRowData[column.key as keyof User].toString()}
-                            onChange={(e) =>
-                              setNewRowData({ ...newRowData, [column.key]: e.target.value })
-                            }
-                            className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
-                          />
-                        )}
+                      ) : column.type === 'boolean' ? (
+                        <select
+                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 " + (column.type == "boolean" && ' max-w-[4rem]')}
+                          name={column.key}
+                          value={newRowData[column.key as keyof User].toString()}
+                          onChange={(e) =>
+                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                          }
+                        >
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                      ) : (
+                        <input
+                          type={column.type}
+                          name={column.key}
+                          value={newRowData[column.key as keyof User].toString()}
+                          onChange={(e) =>
+                            setNewRowData({ ...newRowData, [column.key]: e.target.value })
+                          }
+                          className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 " + (column.key == "ID" && ' max-w-[4rem]')}
+                        />
+                      )}
                     </td>
                   ))}
-
 
                   <td
                     className={`${isHovered === newRowData?.ID
@@ -353,6 +366,7 @@ function Table() {
                   </td>
                 </tr>
               )}
+
               {filteredData.map((item: User) => (
                 <tr
                   key={item.ID}
@@ -365,7 +379,7 @@ function Table() {
                       <input
                         id={`checkbox-table-search-${item.ID}`}
                         type="checkbox"
-                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"}
+                        className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 "}
                         checked={(newData.find((user) => user.id === item.ID)?.isClicked || false) as boolean}
                         onChange={() => {
                           const updatedNewData = newData.map((user) =>
@@ -396,6 +410,13 @@ function Table() {
                                   {`${currency.ID} - ${currency.Name}`}
                                 </option>
                               ))
+                            ) : column.key === 'Language' ? (
+                              // For the "Language" column
+                              <>
+                                <option value="en">en</option>
+                                <option value="fr">fr</option>
+                              </>
+
                             ) : (
                               countries.map((country) => (
                                 <option key={country.ID} value={country.ID}>
@@ -421,7 +442,7 @@ function Table() {
                               name={column.key}
                               value={item[column.key as keyof User].toString()}
                               onChange={(e) => handleInputChange(e, item.ID, column.key)}
-                              className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" + (column.key == "ID" && ' max-w-[4rem]')}
+                              className={"bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 " + (column.key == "ID" && ' max-w-[4rem]')}
                             />
                           )
                       ) : (
@@ -451,12 +472,12 @@ function Table() {
                         </button>
 
                       )}
-                      <button
+                      {/* <button
                         onClick={() => handleEdit(item.ID)}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                       >
                         <VisibleIcon />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => handleDelete(item.ID)}
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"

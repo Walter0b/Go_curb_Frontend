@@ -14,7 +14,6 @@ export function getCountries() {
 export function getCurrencies() {
     return axios.get(`${url}/Currencies`)
 }
-console.log(`${url}/Currencies`)
 export function save(newRowData: User) {
     return axios
         .post(`${url}/customers`, newRowData, {

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { User } from "../models/interfaces";
+import { User } from '../models/interfaces';
 
 export function getData() {
     return axios.get('http://localhost:8080');

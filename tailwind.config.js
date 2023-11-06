@@ -1,7 +1,8 @@
+// eslint-disable-next-line no-undef
 module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './src/**/*.{tsx,mdx}',
+    './public/svg/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {

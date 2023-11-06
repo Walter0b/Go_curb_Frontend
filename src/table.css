@@ -1,0 +1,6 @@
+.transition-c-0\.5 {
+    transition: all 0.5s ease;
+}
+svg {
+     fill : rgb(59 130 246 / var(--tw-text-opacity))
+}

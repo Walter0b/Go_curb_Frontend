@@ -8,16 +8,16 @@ export function getData() {
 }
 
 export function getCountries() {
-    return axios.get('${url}/Countries')
+    return axios.get(`${url}/Countries`)
 }
 
 export function getCurrencies() {
-    return axios.get('${url}/Currencies')
+    return axios.get(`${url}/Currencies`)
 }
-
+console.log(`${url}/Currencies`)
 export function save(newRowData: User) {
     return axios
-        .post('${url}/customers', newRowData, {
+        .post(`${url}/customers`, newRowData, {
             headers: {
                 'Content-Type': 'application/json',
             },

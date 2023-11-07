@@ -1,0 +1,31 @@
+import { User } from "@/models/interfaces";
+
+export const emptyUser: User = {
+    ID: 0,
+    Customer_name: "",
+    Street: "",
+    City: "",
+    State: "",
+    Zip_code: "",
+    Notes: "",
+    Terms: 0,
+    Account_number: "",
+    Tax_id: "",
+    Balance: "",
+    Is_active: false,
+    Is_sub_agency: false,
+    Language: "",
+    Slug: 0,
+    Id_currency: 0,
+    Id_country: 0,
+    Irs_share_key: "",
+    Currency_rate: 0,
+    Agency: "",
+    Avoid_deletion: false,
+    Is_editable: false,
+    Alias: "",
+    Already_used: 0,
+    Ab_key: "",
+    Tmc_client_number: "",
+    isEditing: false
+};

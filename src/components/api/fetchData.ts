@@ -1,8 +1,9 @@
 import axios from 'axios'
-import { User } from '../models/interfaces';
+import { User } from '@/models/interfaces';
 
 
 const url = import.meta.env.VITE_URL
+console.log("herrrrreee",url)
 export function getData() {
     return axios.get(url);
 }
@@ -61,6 +62,6 @@ export function update(editedUser: User) {
         })
 }
 
-export function deleteUser(customer: User) {
-    return axios.delete(`${url}/customer/${customer.ID}`);
+export function deleteUser(customer: number) {
+    return axios.delete(`${url}/customer/${customer}`);
 }

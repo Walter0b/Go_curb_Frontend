@@ -39,22 +39,24 @@ function EditToolbar(props: EditToolbarProps) {
         const newId = prompt('Enter the new ID:');
 
         // Check if a valid ID was entered
-        if (newId !== null && newId.trim() !== '') {
-            // Create a new row with the entered ID and default values
+        const newIdInt = parseInt(newId || "", 10); // Base 10
+        if (newIdInt) {
             const newRow = {
                 ...emptyUser,
-                ID: newId, // Set the ID field to the entered value
+                ID: newIdInt, // Set the ID field to the parsed integer
             };
-
             // Update the rows state with the new row
             setRows((oldRows) => [...oldRows, newRow]);
 
             setRowModesModel((oldModel) => ({
                 ...oldModel,
-                [newId]: { mode: GridRowModes.Edit, fieldToFocus: 'ID' },
+                [newId || ""]: { mode: GridRowModes.Edit, fieldToFocus: 'ID' },
             }));
+        } else {
+            alert('Invalid ID. Please enter a valid integer ID.');
         }
-    };
+    }
+
 
 
 

@@ -1,8 +1,12 @@
 package tableTypes
 
+type BaseEntity struct {
+	ID int `gorm:"primaryKey"`
+	Name string
+}
+
 type Customer struct {
-	ID                int `gorm:"primaryKey;"`
-	Customer_name     string
+	BaseEntity
 	Street            string
 	City              string
 	State             string
@@ -28,13 +32,14 @@ type Customer struct {
 	Ab_key            string
 	Tmc_client_number string
 }
-type Entity struct {
-	ID   int64 `gorm:"primaryKey"`
-	Name string
+
+type Currency struct {
+	BaseEntity
 }
 
-type Currency Entity
-type Country Entity
+type Country struct {
+	BaseEntity
+}
 
 func (Country) TableName() string {
 	return "country"
@@ -43,6 +48,7 @@ func (Country) TableName() string {
 func (Currency) TableName() string {
 	return "currency"
 }
+
 func (Customer) TableName() string {
 	return "customer"
 }

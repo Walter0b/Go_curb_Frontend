@@ -18,11 +18,11 @@ import {
     GridEventListener,
     GridRowId,
     GridRowEditStopReasons,
+    GridPaginationModel,
 } from '@mui/x-data-grid';
 import { useEffect } from 'react';
 import { User, Currency, Country, emptyUser } from '@/models/interfaces';
 import { deleteUser, getCountries, getCurrencies, getData, update } from './api/fetchData';
-
 
 
 interface EditToolbarProps {
@@ -74,9 +74,13 @@ export default function FullFeaturedCrudGrid() {
     const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
     const [currencies, setCurrencies] = React.useState<Currency[]>([]);
     const [countries, setCountries] = React.useState<Country[]>([]);
-
+    const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+        page: 0,
+        pageSize: 7,
+    });
+    const [rowCountState, setRowCountState] = React.useState(0);
     useEffect(() => {
-
+        fetchData(paginationModel);
         getCurrencies().then((response) => {
             // Assuming the response is an array of currency objects with id and name properties
             setCurrencies(response.data);
@@ -94,19 +98,23 @@ export default function FullFeaturedCrudGrid() {
                 console.error('Failed to fetch country data:', error);
             });
 
-        //setNewData(data)
-        getData().then((response) => {
-            // Assuming the response is an array of User objects
-            const initialNewData = response.data as User[];
-
-            setRows(initialNewData);
-        })
-            .catch((error) => {
-                console.error('API request failed:', error);
-            });
 
     }, []);
 
+    const fetchData = (paginationModel : { page : number, pageSize : number} ) => {
+        // Fetch data with pagination parameters
+
+        getData(paginationModel.page as number, paginationModel.pageSize)
+            .then((response) => {
+                console.log(paginationModel)
+                const data = response.data.data as User[];
+                setRows(data);
+                setRowCountState(response.data.totalRowCount as number); // Update the total row count
+            })
+            .catch((error) => {
+                console.error('API request failed:', error);
+            });
+    };
 
     const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
         if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -133,6 +141,13 @@ export default function FullFeaturedCrudGrid() {
                     console.error('Failed to delete data:', error);
                 });
         }
+    };
+    const handlePaginationChange = (newPaginationModel: GridPaginationModel) => {
+        console.log('Pagination changed before:', paginationModel)
+        setPaginationModel(newPaginationModel);
+        console.log('Pagination changed after:', paginationModel)
+        console.log('Pagination changed variable direct:', newPaginationModel)
+        fetchData(newPaginationModel);
     };
 
     const handleCancelClick = (id: GridRowId) => () => {
@@ -234,6 +249,7 @@ export default function FullFeaturedCrudGrid() {
         },
     ];
     // console.log(rows)
+    console.log(paginationModel)
     return (
         <Box
             sx={{
@@ -248,13 +264,35 @@ export default function FullFeaturedCrudGrid() {
             }}
         >
             <DataGrid
+                initialState={{
+                    columns: {
+                        columnVisibilityModel: {
+                            Name: false,
+                            Street: false,
+                            City: false,
+                            State: false,
+                            Notes: false,
+                            Terms: false,
+                            Irs_share_key: false,
+                            Tmc_client_number: false,
+                            Zip_code: false,
+                            isEditing: false,
+                            Already_used: false,
+
+                        },
+                    },
+                }}
                 rows={rows}
                 columns={columns}
                 editMode="row"
-                rowModesModel={rowModesModel}
                 onRowModesModelChange={handleRowModesModelChange}
                 onRowEditStop={handleRowEditStop}
+                paginationMode="server"
+                rowCount={rowCountState}
+                pageSizeOptions={[7]}
                 processRowUpdate={processRowUpdate}
+                onPaginationModelChange={handlePaginationChange}
+                paginationModel={paginationModel}
                 getRowId={(row) => row.ID}
                 slots={{
                     toolbar: EditToolbar,
@@ -262,6 +300,7 @@ export default function FullFeaturedCrudGrid() {
                 slotProps={{
                     toolbar: { setRows, setRowModesModel },
                 }}
+
             />
         </Box>
     );

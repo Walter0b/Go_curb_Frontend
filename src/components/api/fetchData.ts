@@ -3,17 +3,19 @@ import { User } from '@/models/interfaces';
 
 
 const url = import.meta.env.VITE_URL
-console.log("herrrrreee",url)
-export function getData() {
-    return axios.get(url);
+
+
+// /customers?page=1&pageSize=10 
+export function getData(pageNumber : number ,pageSize : number) {
+    return axios.get(`${url}/customers?page=${pageNumber}&pageSize=${pageSize}`)
 }
 
 export function getCountries() {
-    return axios.get(`${url}/Countries`)
+    return axios.get(`${url}/countries`);
 }
 
 export function getCurrencies() {
-    return axios.get(`${url}/Currencies`)
+    return axios.get(`${url}/currencies`)
 }
 export function save(newRowData: User) {
     return axios

@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 0 184 179;
+    --color-secondary: 15 23 42;
+    --color-v_dark: 52 73 94;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    /* ... */
+  }
+}

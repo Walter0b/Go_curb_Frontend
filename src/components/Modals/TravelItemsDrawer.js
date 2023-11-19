@@ -11,7 +11,8 @@ import {
     Tr,
     useDisclosure
 } from "@chakra-ui/react";
-import {AddIcon} from "@chakra-ui/icons";
+
+import { travelItems } from "../../mock/data";
 
 export default function TravelItemsDrawer(props) {
 
@@ -21,6 +22,18 @@ export default function TravelItemsDrawer(props) {
         onClose: () => props.onSetDrawerState()
     })
     const [placement, setPlacement] = useState('top')
+    const [travelItemsData, setTravelItemsData] = useState(travelItems.map((item) => ({...item, checked: false})));
+    const [selectedTravelItems, setSelectedTravelItems] = useState([]);
+
+    const onSelectTravelItem = (isChecked, id) => {
+        setTravelItemsData(travelItemsData.map((item) => item.id === id ? {...item, checked: isChecked} : {...item}))
+        isChecked ? setSelectedTravelItems([...selectedTravelItems, id]) : setSelectedTravelItems(selectedTravelItems.filter((item) => item !== id))
+    }
+
+    const addTravelitems = () => {
+        props.onAddTravelItems(selectedTravelItems)
+        onClose()
+    }
 
     return (
         <>
@@ -37,7 +50,9 @@ export default function TravelItemsDrawer(props) {
                                             <Th>
                                                 <Button
                                                         size='xs'
-                                                        colorScheme='green'>Add</Button>
+                                                        colorScheme='green'
+                                                        isDisabled={!selectedTravelItems.length}
+                                                        onClick={() => addTravelitems()}>Add</Button>
                                             </Th>
                                             <Th></Th>
                                             <Th></Th>
@@ -57,17 +72,22 @@ export default function TravelItemsDrawer(props) {
                                         </Tr>
                                     </Thead>
                                     <Tbody>
-                                        <Tr>
-                                            <Td>
-                                                <FormControl>
-                                                    <Checkbox size='md' colorScheme='green'></Checkbox>
-                                                </FormControl>
-                                            </Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                        </Tr>
+                                        {travelItemsData.map((travelItem) => (
+                                            <Tr key={travelItem.id}>
+                                                <Td>
+                                                    <FormControl>
+                                                        <Checkbox size='md'
+                                                                  colorScheme='green'
+                                                                  isChecked={travelItem.checked}
+                                                                  onChange={(e) => onSelectTravelItem(e.target.checked, travelItem.id)}></Checkbox>
+                                                    </FormControl>
+                                                </Td>
+                                                <Td>{travelItem.ticketNumber}</Td>
+                                                <Td>{travelItem.travelerName}</Td>
+                                                <Td>{travelItem.itinerary}</Td>
+                                                <Td>{travelItem.totalPrice}</Td>
+                                            </Tr>
+                                        ))}
                                     </Tbody>
                                 </Table>
                             </TableContainer>

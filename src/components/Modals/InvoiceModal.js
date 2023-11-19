@@ -14,6 +14,8 @@ import {useRef, useState} from "react";
 import TravelItems from "../TravelItems";
 import TravelItemsDrawer from "./TravelItemsDrawer";
 
+import {customers, travelItems} from "../../mock/data";
+
 export default function InvoiceModal(props) {
 
     const { isOpen, onOpen, onClose } = useDisclosure({
@@ -25,8 +27,22 @@ export default function InvoiceModal(props) {
     const initialRef = useRef(null)
     const finalRef = useRef(null)
 
-    const [input, setInput] = useState('');
     const [isTravelItemDrawerOpen, setIsTravelItemDrawerOpen] = useState(false);
+    const [customersData, setCustomersData] = useState(customers);
+    const [selectedAccount, setSelectedAccount] = useState({});
+    const [travelItemsData, setTravelItemsData] = useState(travelItems);
+    const [selectedTravelItems, setSelectedTravelItems] = useState([]);
+
+    const onAccountSelection = (value) => {
+        setSelectedAccount(customersData.find(cust => cust.id === +value));
+    }
+    const handleAddTravelItems = (items) => {
+        setSelectedTravelItems(travelItemsData.filter((item) => items.includes(item.id)))
+    }
+
+    const removeTravelItemFromList = (id) => {
+        setSelectedTravelItems(travelItemsData.filter((item) => item.id = id))
+    }
 
     return (
         <>
@@ -54,36 +70,35 @@ export default function InvoiceModal(props) {
                             <Box w='100%'>
                                 <FormControl isRequired>
                                     <FormLabel>Customer Account</FormLabel>
-                                    <Select placeholder='Select option'>
-                                        <option value='option1'>Option 1</option>
-                                        <option value='option2'>Option 2</option>
-                                        <option value='option3'>Option 3</option>
+                                    <Select placeholder='Select an account' onChange={(e) => onAccountSelection(e.target.value)}>
+                                        {customersData.map((customer) => (
+                                            <option key={customer.id}
+                                                    value={customer.id}>{customer.accountNumber}</option>
+                                        ))}
                                     </Select>
                                 </FormControl>
 
                                 <FormControl mt={4} isRequired>
                                     <FormLabel>Due Date</FormLabel>
-                                    <Input type='date' placeholder='Due Date' />
+                                    <Input type='date' placeholder='Due Date'/>
                                 </FormControl>
                             </Box>
                             <Box w='100%'>
                                 <FormControl>
                                     <FormLabel>Account Name</FormLabel>
-                                    <Input ref={initialRef} placeholder='Account name' />
-                                </FormControl>
-
-                                <FormControl mt={4}>
-                                    <FormLabel>Customer Email</FormLabel>
-                                    <Input type='email' ref={initialRef} placeholder='Email' />
+                                    <Input ref={initialRef} placeholder='Account name' value={selectedAccount.customerName} />
                                 </FormControl>
                             </Box>
                         </Flex>
                         <Center>
                             <Box mt={8} w='80%' border='1px' borderColor='gray.200' borderRadius={8}>
                                 <TravelItems
+                                    travelItems={selectedTravelItems}
+                                    updateSelectedTravelItems={(id) => removeTravelItemFromList(id)}
                                     onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>
                             </Box>
                             <TravelItemsDrawer isDrawerOpen={isTravelItemDrawerOpen}
+                                               onAddTravelItems={handleAddTravelItems}
                                                onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>
                         </Center>
                     </ModalBody>

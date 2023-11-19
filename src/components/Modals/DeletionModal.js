@@ -19,7 +19,6 @@ export default function DeletionModal(props) {
     })
 
     const deleteItem = (itemName) => {
-        console.log('item deleted')
         onClose();
     }
 

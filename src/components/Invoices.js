@@ -1,16 +1,14 @@
 import {
     Box, Button,
     Center,
-    Heading, HStack, IconButton, Stack,
+    Stack,
     Table,
-    TableCaption,
     TableContainer,
     Tbody,
     Td,
-    Tfoot,
     Th,
     Thead,
-    Tr, useDisclosure
+    Tr,
 } from "@chakra-ui/react";
 
 import {useState} from "react";
@@ -20,18 +18,27 @@ import CreditsModal from "./Modals/CreditsModal";
 import {FaPenFancy, FaRegCircleXmark} from "react-icons/fa6";
 import DeletionModal from "./Modals/DeletionModal";
 
+import { invoices } from "../mock/data";
+
 export default function Invoices() {
 
     const [openModal, setOpenModal] = useState(false);
-    const [invoiceData, setInvoiceData] = useState({});
+    const [singleInvoice, setSingleInvoice] = useState({});
     const [isDetailsOpened, setIsDetailsOpened] = useState(false);
     const [isCreditOpened, setIsCreditOpened] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isDeletionModalOpened, setIsDeletionModalOpened] = useState(false);
+    const [invoicesData, setInvoicesData] = useState(invoices);
 
-    const openDetailDrawer = (isOpen, isInEditMode) => {
+    const openDetailDrawer = (invoice, isOpen, isInEditMode) => {
         setIsDetailsOpened(isOpen)
         setIsEditMode(isInEditMode)
+        setSingleInvoice(invoice)
+    }
+
+    const deleteInvoice = (invoice) => {
+        setSingleInvoice(invoice)
+        setIsDeletionModalOpened(!isDeletionModalOpened)
     }
 
     return (
@@ -61,35 +68,40 @@ export default function Invoices() {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                <Tr>
-                                    <Td></Td>
-                                    <Td onClick={() => openDetailDrawer(true, false)}></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td>
-                                        <Stack direction='row' spacing={6}>
-                                            <Button colorScheme='blue' size='sm' onClick={() => openDetailDrawer(true, true)}>
-                                                <FaPenFancy/>
-                                            </Button>
-                                            <Button colorScheme='red' size='sm' onClick={() => setIsDeletionModalOpened(!isDeletionModalOpened)}
-                                                    onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}>
-                                                <FaRegCircleXmark/>
-                                            </Button>
-                                        </Stack>
-                                    </Td>
-                                </Tr>
+                                {invoicesData.map((invoice) =>
+                                    (<Tr key={invoice.id}>
+                                        <Td>{invoice.creationDate}</Td>
+                                        <Td onClick={() => openDetailDrawer(invoice,true, false)}>
+                                            {invoice.invoice_number}
+                                        </Td>
+                                        <Td>{invoice.customer.customerName}</Td>
+                                        <Td>{invoice.status}</Td>
+                                        <Td>{invoice.dueDate}</Td>
+                                        <Td>
+                                            <Stack direction='row' spacing={6}>
+                                                <Button colorScheme='blue' size='sm' onClick={() => openDetailDrawer(invoice,true, true)}>
+                                                    <FaPenFancy/>
+                                                </Button>
+                                                <Button colorScheme='red' size='sm' onClick={() => deleteInvoice(invoice)}
+                                                        onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}>
+                                                    <FaRegCircleXmark/>
+                                                </Button>
+                                            </Stack>
+                                        </Td>
+                                    </Tr>)
+                                )}
                             </Tbody>
                         </Table>
                     </TableContainer>
                 </Box>
-                <InvoiceModal data={invoiceData} isOpen={openModal} onClose={() => setOpenModal(false)}/>
+                <InvoiceModal isOpen={openModal} onClose={() => setOpenModal(!openModal)}/>
                 <InvoiceDetailsDrawer isOpen={isDetailsOpened}
                                       editMode={isEditMode}
                                       onClose={() => setIsDetailsOpened(!isDetailsOpened)}
                                       onOpenCreditModal={() => setIsCreditOpened(!isCreditOpened)}/>
                 <CreditsModal isOpen={isCreditOpened} onClose={() => setIsCreditOpened(!isCreditOpened)}/>
-                <DeletionModal itemName='invoice' isOpen={isDeletionModalOpened}
+                <DeletionModal itemName='invoice' itemId={singleInvoice.id}
+                               isOpen={isDeletionModalOpened}
                                onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}
                 />
             </Center>

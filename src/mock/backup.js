@@ -93,6 +93,7 @@ const travelItems = [
         "travelerName":"Noah",
         "itinerary":"Yde-Mbouda",
         "totalPrice": 5000.00
+
     },
     {
         "id":1,
@@ -100,6 +101,7 @@ const travelItems = [
         "travelerName":"Tagny",
         "itinerary":"Yde-Amsterdam",
         "totalPrice": 3000.00
+
     },
     {
         "id":2,
@@ -107,7 +109,6 @@ const travelItems = [
         "travelerName":"Lienou",
         "itinerary":"Yde-CapTown",
         "totalPrice": 100.00
+
     },
 ]
-
-export { customers, invoices, payments, travelItems }

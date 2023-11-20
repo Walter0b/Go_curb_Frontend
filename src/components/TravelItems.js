@@ -1,6 +1,7 @@
 import {Button, Checkbox, FormControl, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
 import {useState} from "react";
+import {FaRegCircleXmark} from "react-icons/fa6";
 
 export default function TravelItems(props) {
 
@@ -38,8 +39,8 @@ export default function TravelItems(props) {
                                 <Td>{travelItem.itinerary}</Td>
                                 <Td>{travelItem.totalPrice}</Td>
                                 <Td>
-                                    <Button colorScheme='red.500' onClick={() => props.updateSelectedTravelItems(travelItem.id)}>
-                                        -
+                                    <Button colorScheme='red' size='sm' onClick={() => props.updateSelectedTravelItems(travelItem.id)}>
+                                        <FaRegCircleXmark/>
                                     </Button>
                                 </Td>
                             </Tr>))}

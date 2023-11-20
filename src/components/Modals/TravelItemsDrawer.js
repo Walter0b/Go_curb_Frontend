@@ -7,7 +7,7 @@ import {
     DrawerContent,
     DrawerHeader,
     DrawerOverlay, FormControl, Table,
-    TableContainer, Tbody, Td, Tfoot, Th, Thead,
+    TableContainer, Tbody, Td, Th, Thead,
     Tr,
     useDisclosure
 } from "@chakra-ui/react";
@@ -18,7 +18,7 @@ export default function TravelItemsDrawer(props) {
 
     const { isOpen, onOpen, onClose } = useDisclosure({
         isOpen: props.isDrawerOpen,
-        onOpen: () => console.log('Opened'),
+        onOpen: void 0,
         onClose: () => props.onSetDrawerState()
     })
     const [placement, setPlacement] = useState('top')

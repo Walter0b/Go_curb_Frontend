@@ -46,14 +46,14 @@ const invoices = [
             },
         ],
         "customer": {
-            "Id": 0,
+            "id": 0,
             "customerName":"Pierre Lorel",
             "state":"Centre",
-            "accountNumber":"004959-BE45",
+            "accountNumber":"10001",
             "idCountry":237,
             "alias": "PL",
-            "tmcClientNumber":"550052",
-            "abKey":"ukey",
+            "tmcClientNumber":"11004422",
+            "abKey":"0000",
             "slug":23535,
             "isActive": true,
         },
@@ -67,19 +67,19 @@ const payments = [
         "paymentDate":"2022-10-19",
         "paymentMode": "cash",
         "idCustomer":0,
-        "amount":0.00,
-        "balance":0.00,
+        "amount":50000.00,
+        "balance":50000.00,
         "usedAmount": 0.00,
         "status": "open",
         "customer":{
             "Id": 0,
-            "customerName":"",
-            "state":"",
-            "accountNumber":"",
-            "idCountry":0,
-            "alias": "",
-            "tmcClientNumber":"",
-            "abKey":"",
+            "customerName":"Tagny",
+            "state":"Centre",
+            "accountNumber":"9932-NN",
+            "idCountry":1,
+            "alias": "TNG",
+            "tmcClientNumber":"00293022",
+            "abKey":"TO",
             "slug":23535,
             "isActive": true,
         }
@@ -110,4 +110,6 @@ const travelItems = [
     },
 ]
 
-export { customers, invoices, payments, travelItems }
+const paymentMode = ['Bank Transfer', 'Cash', 'Cheque', 'Mobile Money', 'Pos'];
+
+export { customers, invoices, payments, paymentMode, travelItems }

@@ -20,11 +20,16 @@ import {FaPenFancy, FaRegCircleXmark} from "react-icons/fa6";
 import DeletionModal from "./Modals/DeletionModal";
 import PaymentDetailsDrawer from "./Modals/PaymentDetailsDrawer";
 
+import {payments, paymentMode} from "../mock/data";
+
 export default function Payments() {
 
     const [isPaymentModalopened, setIsPaymentModalopened] = useState(false);
     const [isDetailsOpened, setIsDetailsOpened] = useState(false);
     const [isDeletionModalOpened, setIsDeletionModalOpened] = useState(false);
+
+    const [paymentData, setPaymentData] = useState(payments);
+    const [singlePayment, setSinglePayment] = useState({});
 
     return (
         <>
@@ -77,17 +82,20 @@ export default function Payments() {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                <Tr>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
-                                    <Td></Td>
+                                {paymentData.map((payment) => (<Tr>
+                                    <Td>{payment.paymentDate}</Td>
+                                    <Td>{payment.paymentNumber}</Td>
+                                    <Td>{payment.customer.customerName}</Td>
+                                    <Td>{payment.status}</Td>
+                                    <Td>{payment.paymentMode}</Td>
+                                    <Td>{payment.amount}</Td>
+                                    <Td>{payment.balance}</Td>
                                     <Td>
                                         <Stack direction='row' spacing={6}>
-                                            <Button colorScheme='blue' size='sm' onClick={() => setIsDetailsOpened(!isDetailsOpened)}>
+                                            <Button colorScheme='blue' size='sm' onClick={() => {
+                                                setIsDetailsOpened(!isDetailsOpened)
+                                                setSinglePayment(payment)
+                                            }}>
                                                 <FaPenFancy/>
                                             </Button>
                                             <Button colorScheme='red' size='sm' onClick={() => setIsDeletionModalOpened(!isDeletionModalOpened)}
@@ -96,7 +104,7 @@ export default function Payments() {
                                             </Button>
                                         </Stack>
                                     </Td>
-                                </Tr>
+                                </Tr>))}
                             </Tbody>
                         </Table>
                     </TableContainer>
@@ -105,6 +113,7 @@ export default function Payments() {
                 <DeletionModal itemName='payment' isOpen={isDeletionModalOpened}
                                onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}/>
                 <PaymentDetailsDrawer isOpen={isDetailsOpened}
+                                      payment={singlePayment}
                                       onClose={() => setIsDetailsOpened(!isDetailsOpened)}/>
             </Center>
         </>

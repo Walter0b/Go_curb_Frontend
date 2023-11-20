@@ -31,9 +31,9 @@ export default function Invoices() {
     const [invoicesData, setInvoicesData] = useState(invoices);
 
     const openDetailDrawer = (invoice, isOpen, isInEditMode) => {
-        setIsDetailsOpened(isOpen)
         setIsEditMode(isInEditMode)
-        setSingleInvoice(invoice)
+        setSingleInvoice({...invoice})
+        setIsDetailsOpened(isOpen)
     }
 
     const deleteInvoice = (invoice) => {
@@ -97,6 +97,7 @@ export default function Invoices() {
                 <InvoiceModal isOpen={openModal} onClose={() => setOpenModal(!openModal)}/>
                 <InvoiceDetailsDrawer isOpen={isDetailsOpened}
                                       editMode={isEditMode}
+                                      invoice={singleInvoice}
                                       onClose={() => setIsDetailsOpened(!isDetailsOpened)}
                                       onOpenCreditModal={() => setIsCreditOpened(!isCreditOpened)}/>
                 <CreditsModal isOpen={isCreditOpened} onClose={() => setIsCreditOpened(!isCreditOpened)}/>

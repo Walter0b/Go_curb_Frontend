@@ -1,6 +1,6 @@
 import {
     Box,
-    Button,
+    Button, Center,
     Drawer,
     DrawerBody,
     DrawerCloseButton,
@@ -32,6 +32,9 @@ import {
 import RelatedInvoices from "../RelatedInvoices";
 import {useRef, useState} from "react";
 import {ChevronDownIcon, HamburgerIcon} from "@chakra-ui/icons";
+import {customers, travelItems} from "../../mock/data";
+import TravelItems from "../TravelItems";
+import TravelItemsDrawer from "./TravelItemsDrawer";
 
 export default function InvoiceDetailsDrawer(props) {
 
@@ -43,8 +46,23 @@ export default function InvoiceDetailsDrawer(props) {
         onClose: () => props.onClose()
     })
 
+    const currentDate = new Date();
+    const initialDueDate = currentDate.setDate(currentDate.getDate() + 1)
+
+    const [customersData, setCustomersData] = useState(customers);
+    const [selectedAccount, setSelectedAccount] = useState({});
+    const [travelItemsData, setTravelItemsData] = useState(travelItems);
+
+    const [date, setDate] = useState(new Date(initialDueDate).toLocaleDateString('en-GB').split('/').reverse().join('-'));
+    const [cusName, setCusName] = useState('');
+
     const initialRef = useRef(null)
     const finalRef = useRef(null)
+
+    const onAccountSelection = (value) => {
+        setSelectedAccount(customersData.find(cust => cust.id === +value));
+        setCusName(customersData.find(cust => cust.id === +value).customerName)
+    }
 
     return (
         <>
@@ -90,15 +108,40 @@ export default function InvoiceDetailsDrawer(props) {
                         </Box>}
                     </DrawerHeader>
                     <DrawerBody>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            Consequat nisl vel pretium lectus quam id. Semper quis lectus
-                            nulla at volutpat diam ut venenatis. Dolor morbi non arcu risus
-                            quis varius quam quisque. Massa ultricies mi quis hendrerit dolor
-                            magna eget est lorem. Erat imperdiet sed euismod nisi porta.
-                            Lectus vestibulum mattis ullamcorper velit.
-                        </p>
+                        {props.editMode ? (<form>
+                            <FormControl isRequired>
+                                <FormLabel>Customer Account</FormLabel>
+                                <Select placeholder='Select an account'
+                                        value={props.invoice.customerName?.accountNumber}
+                                        onChange={(e) => onAccountSelection(e.target.value)}>
+                                    {customersData.map((customer) => (
+                                        <option key={customer.id}
+                                                value={customer.id}>{customer.accountNumber}</option>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl mt={4} isRequired>
+                                <FormLabel>Due Date</FormLabel>
+                                <Input type='date' placeholder='Due Date' value={date}
+                                       onChange={(e) => setDate(e.target.value)}/>
+                            </FormControl>
+                            {/*<Center>*/}
+                            {/*    <Box mt={8} w='80%' border='1px' borderColor='gray.200' borderRadius={8}>*/}
+                            {/*        <TravelItems*/}
+                            {/*            travelItems={selectedTravelItems}*/}
+                            {/*            updateSelectedTravelItems={(id) => removeTravelItemFromList(id)}*/}
+                            {/*            onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>*/}
+                            {/*    </Box>*/}
+                            {/*    <TravelItemsDrawer isDrawerOpen={isTravelItemDrawerOpen}*/}
+                            {/*                       travelItems={selectedTravelItems}*/}
+                            {/*                       onAddTravelItems={handleAddTravelItems}*/}
+                            {/*                       onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>*/}
+                            {/*</Center>*/}
+                        </form>) :
+                            (<Center>
+                                <Box></Box>
+                            </Center>)}
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

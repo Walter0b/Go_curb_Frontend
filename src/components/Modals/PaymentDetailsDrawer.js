@@ -1,12 +1,16 @@
 import {
+    Box,
     Drawer, DrawerBody,
     DrawerCloseButton,
     DrawerContent,
     DrawerHeader,
-    DrawerOverlay,
+    DrawerOverlay, Flex, FormControl, FormLabel, Input, InputGroup, InputLeftElement, Select,
     useDisclosure
 } from "@chakra-ui/react";
 import {useRef, useState} from "react";
+import RelatedInvoices from "../RelatedInvoices";
+
+import {paymentMode, payments, customers} from "../../mock/data";
 
 export default function PaymentDetailsDrawer(props) {
 
@@ -17,6 +21,12 @@ export default function PaymentDetailsDrawer(props) {
         onOpen: () =>  void 0,
         onClose: () => props.onClose()
     })
+
+    const [customerData, setCustomerData] = useState(customers);
+    const [paymentModeData, setPaymentModeData] = useState(paymentMode);
+    const [paymentData, setPaymentData] = useState(payments);
+
+    const [amount, setAmount] = useState(0);
 
     const initialRef = useRef(null)
     const finalRef = useRef(null)
@@ -31,15 +41,35 @@ export default function PaymentDetailsDrawer(props) {
                         Payment Details
                     </DrawerHeader>
                     <DrawerBody>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                            Consequat nisl vel pretium lectus quam id. Semper quis lectus
-                            nulla at volutpat diam ut venenatis. Dolor morbi non arcu risus
-                            quis varius quam quisque. Massa ultricies mi quis hendrerit dolor
-                            magna eget est lorem. Erat imperdiet sed euismod nisi porta.
-                            Lectus vestibulum mattis ullamcorper velit.
-                        </p>
+                        <Flex alignItems='horizontal' gap='5' minWidth='max-content'>
+                            <Box w='100%' p={4}>
+                                <FormControl>
+                                    <FormLabel>Deposit To</FormLabel>
+                                    <Select placeholder='Select account'>
+                                        {customerData.map((customer) => <option key={customer.id} value={customer.id}>{customer.accountNumber}</option>)}
+                                    </Select>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel>Payment Mode</FormLabel>
+                                    <Select placeholder='Select payment mode'>
+                                        {paymentModeData.map((pm) => <option key={pm} value={pm}>{pm}</option>)}
+                                    </Select>
+                                </FormControl>
+                                <FormControl>
+                                    <FormLabel>Amount</FormLabel>
+                                    <InputGroup>
+                                        <InputLeftElement
+                                            pointerEvents='none'
+                                            color='gray.300'
+                                            fontSize='1em'
+                                            children='XAF'
+                                        />
+                                        <Input placeholder='Enter amount' value={amount} onChanges={(e) => setAmount(e.target.value)}/>
+                                    </InputGroup>
+                                </FormControl>
+                            </Box>
+                        </Flex>
+                        <RelatedInvoices/>
                     </DrawerBody>
                 </DrawerContent>
             </Drawer>

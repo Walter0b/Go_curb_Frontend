@@ -1,18 +1,18 @@
-import { useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import {
     Box,
-    Button, Checkbox,
+    Button, Center, Checkbox,
     Drawer,
     DrawerBody,
     DrawerContent,
     DrawerHeader,
-    DrawerOverlay, FormControl, Table,
+    DrawerOverlay, FormControl, Spinner, Stack, Table,
     TableContainer, Tbody, Td, Th, Thead,
     Tr,
     useDisclosure
 } from "@chakra-ui/react";
 
-import { travelItems } from "../../mock/data";
+import {getTravelItems} from "../../services/api";
 
 export default function TravelItemsDrawer(props) {
 
@@ -21,38 +21,51 @@ export default function TravelItemsDrawer(props) {
         onOpen: void 0,
         onClose: () => props.onSetDrawerState()
     })
-    const [placement, setPlacement] = useState('top')
-    const [travelItemsData, setTravelItemsData] = useState(travelItems.map((item) => ({...item, checked: false})));
-    const [selectedTravelItems, setSelectedTravelItems] = useState([]);
+
+    const [travelItemData, setTravelItemData] = useState([]);
+
+    const travelItemsRef = useRef([]);
+    const selectedTravelItemRef = useRef([]);
+
+    useEffect(() => {
+        getTravelItems().then((response) => {
+            travelItemsRef.current = response.data.map((item) => ({...item, checked: false}))
+            setTravelItemData(travelItemsRef.current)
+        })
+    }, []);
 
     const onSelectTravelItem = (isChecked, id) => {
-        setTravelItemsData(travelItemsData.map((item) => item.id === id ? {...item, checked: isChecked} : {...item}))
-        isChecked ? setSelectedTravelItems([...selectedTravelItems, id]) : setSelectedTravelItems(selectedTravelItems.filter((item) => item !== id))
+        travelItemsRef.current = travelItemData.map((item) => item.ID === id ? {...item, checked: isChecked} : {...item})
+        selectedTravelItemRef.current = travelItemsRef.current.filter((item) => item.checked === true)
+        setTravelItemData(travelItemsRef.current)
     }
 
     const addTravelitems = () => {
-        props.onAddTravelItems(selectedTravelItems)
+        props.onAddTravelItems(selectedTravelItemRef.current)
         onClose()
     }
 
     return (
         <>
-            <Drawer placement={placement} onClose={onClose} isOpen={isOpen}>
+            <Drawer placement='top' onClose={onClose} isOpen={isOpen}>
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerHeader borderBottomWidth='1px'>Select Sales Items to Invoice for xxxxx</DrawerHeader>
                     <DrawerBody>
                         <Box border='1px' borderColor='gray.200' borderRadius={8}>
-                            <TableContainer>
+                            {travelItemsRef.current.length ? (<TableContainer>
                                 <Table variant='simple'>
                                     <Thead>
                                         <Tr>
                                             <Th>
-                                                <Button
+                                                <Stack direction='horizontal'>
+                                                    <Button
                                                         size='xs'
                                                         colorScheme='green'
-                                                        isDisabled={!selectedTravelItems.length}
-                                                        onClick={() => addTravelitems()}>Add</Button>
+                                                        isDisabled={!selectedTravelItemRef.current.length}
+                                                        onClick={addTravelitems}>Add</Button>
+                                                    <Button size='xs' onClick={() => onClose()}>Cancel</Button>
+                                                </Stack>
                                             </Th>
                                             <Th></Th>
                                             <Th></Th>
@@ -72,25 +85,25 @@ export default function TravelItemsDrawer(props) {
                                         </Tr>
                                     </Thead>
                                     <Tbody>
-                                        {travelItemsData.map((travelItem) => (
-                                            <Tr key={travelItem.id}>
+                                        {travelItemsRef.current.map((travelItem) => (
+                                            <Tr key={travelItem.ID}>
                                                 <Td>
                                                     <FormControl>
                                                         <Checkbox size='md'
                                                                   colorScheme='green'
                                                                   isChecked={travelItem.checked}
-                                                                  onChange={(e) => onSelectTravelItem(e.target.checked, travelItem.id)}></Checkbox>
+                                                                  onChange={(e) => onSelectTravelItem(e.target.checked, travelItem.ID)}></Checkbox>
                                                     </FormControl>
                                                 </Td>
-                                                <Td>{travelItem.ticketNumber}</Td>
-                                                <Td>{travelItem.travelerName}</Td>
-                                                <Td>{travelItem.itinerary}</Td>
-                                                <Td>{travelItem.totalPrice}</Td>
+                                                <Td>{travelItem.TicketNumber}</Td>
+                                                <Td>{travelItem.TravelerName}</Td>
+                                                <Td>{travelItem.Itinerary}</Td>
+                                                <Td>{travelItem.TotalPrice}</Td>
                                             </Tr>
                                         ))}
                                     </Tbody>
                                 </Table>
-                            </TableContainer>
+                            </TableContainer>) : (<Center><Spinner size='xl' /></Center>)}
                         </Box>
                     </DrawerBody>
                 </DrawerContent>

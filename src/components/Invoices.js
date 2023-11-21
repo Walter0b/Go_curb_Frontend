@@ -11,7 +11,7 @@ import {
     Tr,
 } from "@chakra-ui/react";
 
-import {useState} from "react";
+import {useState, useRef, useEffect} from "react";
 import InvoiceModal from "./Modals/InvoiceModal";
 import InvoiceDetailsDrawer from "./Modals/InvoiceDetailsDrawer";
 import CreditsModal from "./Modals/CreditsModal";
@@ -19,6 +19,8 @@ import {FaPenFancy, FaRegCircleXmark} from "react-icons/fa6";
 import DeletionModal from "./Modals/DeletionModal";
 
 import { invoices } from "../mock/data";
+
+import {getInvoices} from "../services/api";
 
 export default function Invoices() {
 
@@ -28,7 +30,20 @@ export default function Invoices() {
     const [isCreditOpened, setIsCreditOpened] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [isDeletionModalOpened, setIsDeletionModalOpened] = useState(false);
-    const [invoicesData, setInvoicesData] = useState(invoices);
+    const [invoicesData, setInvoicesData] = useState([]);
+
+    useEffect( () => {
+        getInvoices().then((response) => {
+            setInvoicesData(response.data.map((inv) => {
+                return {
+                    ...inv,
+                    CreationDate: new Date(inv.CreationDate).toLocaleDateString().split('-').reverse().join('-'),
+                    DueDate: new Date(inv.DueDate).toLocaleDateString().split('-').reverse().join('-'),
+                }
+            }))
+        })
+    }, []);
+
 
     const openDetailDrawer = (invoice, isOpen, isInEditMode) => {
         setIsEditMode(isInEditMode)
@@ -69,14 +84,14 @@ export default function Invoices() {
                             </Thead>
                             <Tbody>
                                 {invoicesData.map((invoice) =>
-                                    (<Tr key={invoice.id}>
-                                        <Td>{invoice.creationDate}</Td>
+                                    (<Tr key={invoice.ID}>
+                                        <Td>{invoice.CreationDate}</Td>
                                         <Td onClick={() => openDetailDrawer(invoice,true, false)}>
-                                            {invoice.invoice_number}
+                                            {invoice.InvoiceNumber}
                                         </Td>
-                                        <Td>{invoice.customer.customerName}</Td>
-                                        <Td>{invoice.status}</Td>
-                                        <Td>{invoice.dueDate}</Td>
+                                        <Td>invoice.customer.customerName</Td>
+                                        <Td>{invoice.Status}</Td>
+                                        <Td>{invoice.DueDate}</Td>
                                         <Td>
                                             <Stack direction='row' spacing={6}>
                                                 <Button colorScheme='blue' size='sm' onClick={() => openDetailDrawer(invoice,true, true)}>

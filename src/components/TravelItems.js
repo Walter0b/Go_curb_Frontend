@@ -1,9 +1,17 @@
 import {Button, Checkbox, FormControl, Table, TableContainer, Tbody, Td, Tfoot, Th, Thead, Tr} from "@chakra-ui/react";
 import {AddIcon} from "@chakra-ui/icons";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import {FaRegCircleXmark} from "react-icons/fa6";
 
 export default function TravelItems(props) {
+
+    const [travelItems, setTravelItems] = useState(props.travelItems);
+
+    const travelItemRef = useRef([]);
+
+    const updateSelectedTravelItemsList = (id) => {
+        props.onUpdateSelectedTravelItems(id)
+    }
 
     return (
         <>
@@ -33,13 +41,13 @@ export default function TravelItems(props) {
                     </Thead>
                     <Tbody>
                         {props.travelItems.map((travelItem) => (
-                            <Tr key={travelItem.id}>
-                                <Td>{travelItem.ticketNumber}</Td>
-                                <Td>{travelItem.travelerName}</Td>
-                                <Td>{travelItem.itinerary}</Td>
-                                <Td>{travelItem.totalPrice}</Td>
+                            <Tr key={travelItem.ID}>
+                                <Td>{travelItem.TicketNumber}</Td>
+                                <Td>{travelItem.TravelerName}</Td>
+                                <Td>{travelItem.Itinerary}</Td>
+                                <Td>{travelItem.TotalPrice}</Td>
                                 <Td>
-                                    <Button colorScheme='red' size='sm' onClick={() => props.updateSelectedTravelItems(travelItem.id)}>
+                                    <Button colorScheme='red' size='sm' onClick={() => updateSelectedTravelItemsList(travelItem.ID)}>
                                         <FaRegCircleXmark/>
                                     </Button>
                                 </Td>

@@ -30,7 +30,7 @@ import {
     useDisclosure
 } from "@chakra-ui/react";
 import RelatedInvoices from "../RelatedInvoices";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {ChevronDownIcon, HamburgerIcon} from "@chakra-ui/icons";
 import {customers, travelItems} from "../../mock/data";
 import TravelItems from "../TravelItems";
@@ -39,6 +39,7 @@ import TravelItemsDrawer from "./TravelItemsDrawer";
 export default function InvoiceDetailsDrawer(props) {
 
     const [size, setSize] = useState('lg')
+    const [invoiceDetails, setInvoiceDetails] = useState({});
 
     const { isOpen, onOpen, onClose } = useDisclosure({
         isOpen: props.isOpen,
@@ -46,12 +47,12 @@ export default function InvoiceDetailsDrawer(props) {
         onClose: () => props.onClose()
     })
 
+
     const currentDate = new Date();
     const initialDueDate = currentDate.setDate(currentDate.getDate() + 1)
 
     const [customersData, setCustomersData] = useState(customers);
     const [selectedAccount, setSelectedAccount] = useState({});
-    const [travelItemsData, setTravelItemsData] = useState(travelItems);
 
     const [date, setDate] = useState(new Date(initialDueDate).toLocaleDateString('en-GB').split('/').reverse().join('-'));
     const [cusName, setCusName] = useState('');

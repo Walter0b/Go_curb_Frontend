@@ -1,19 +1,45 @@
 const url = 'https://go-curb.onrender.com/'
 
-async function getInvoices() {
-    return (await fetch(`${url}invoices?embed=customer`)).json()
+export async function getInvoices() {
+    return (await fetch(`${url}invoices`)).json()
 }
 
-async function getPayments() {
+export async function getPayments() {
     return (await fetch(`${url}payments`)).json();
 }
 
-async function getTravelItems() {
+export async function getTravelItems() {
     return (await fetch(`${url}airbooking`)).json();
 }
 
-async function getCustomers() {
+export async function getCustomers() {
     return (await fetch(`${url}customers`)).json();
 }
 
-export { getInvoices, getTravelItems, getPayments, getCustomers }
+export async function getImputations() {
+    return (await fetch(`${url}imputations`)).json();
+}
+
+export async function getSingleCustomerInfo(id, associatedItem) {
+    return (await fetch(`${url}customer?embed=${associatedItem}&id=${id}`)).json();
+}
+
+export async function postPayment(payment) {
+    return (await fetch(`${url}payments`, {
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payment)
+    })).json();
+}
+
+export async function postInvoice(invoice) {
+    return (await fetch(`${url}invoices`, {
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(invoice)
+    })).json();
+}

@@ -4,14 +4,9 @@ import {
     Flex,
     FormControl,
     FormLabel,
-    IconButton,
     Input,
     InputGroup,
     InputLeftElement,
-    Menu,
-    MenuButton, MenuDivider,
-    MenuGroup, MenuItem,
-    MenuList,
     Modal,
     ModalBody,
     ModalCloseButton,
@@ -22,15 +17,15 @@ import {
     Select,
     Table,
     TableContainer, Tbody, Td,
-    Text, Tfoot,
+    Text,
     Th,
     Thead,
     Tr,
     useDisclosure
 } from "@chakra-ui/react";
-import RelatedInvoices from "../RelatedInvoices";
-import {useRef} from "react";
-import {HamburgerIcon} from "@chakra-ui/icons";
+import {useEffect, useRef, useState} from "react";
+import {getImputations, getSingleCustomerInfo} from "../../services/api";
+import {reformatDate} from "../../utils/utilsMethods";
 
 export default function CreditsModal(props) {
 
@@ -40,8 +35,20 @@ export default function CreditsModal(props) {
         onClose: () => props.onClose()
     })
 
+    const [associatedPayments, setAssociatedPayments] = useState([]);
+
     const initialRef = useRef(null)
     const finalRef = useRef(null)
+
+    useEffect(() => {
+        getImputations().then((response) => {
+            console.log(response.data)
+        })
+        getSingleCustomerInfo(props.invoice.CustomerID, 'Payments').then((response) => {
+            setAssociatedPayments(response.Payments.Payments)
+        }).catch(() => {})
+    }, [props?.invoice]);
+
 
     return (
         <>
@@ -54,11 +61,11 @@ export default function CreditsModal(props) {
             >
                 <ModalOverlay />
                 <ModalContent>
-                    <ModalHeader>Apply credits to xxxx</ModalHeader>
+                    <ModalHeader>Apply credits to {props.invoice.InvoiceNumber}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
                         <Text fontSize='15px' color='black.300' mb={5}>
-                            Invoice Balance xxx: xxxxxx
+                            Invoice Balance: {props.invoice.Balance}
                         </Text>
                         <Box border='1px' mt={5} borderRadius='8' borderColor='gray.200' w='100%'>
                             <TableContainer>
@@ -74,24 +81,24 @@ export default function CreditsModal(props) {
                                         </Tr>
                                     </Thead>
                                     <Tbody>
-                                        <Tr>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td></Td>
-                                            <Td>
-                                                <InputGroup>
-                                                    <InputLeftElement
-                                                        pointerEvents='none'
-                                                        color='gray.300'
-                                                        fontSize='1em'
-                                                        children='XAF'
-                                                    />
-                                                    <Input placeholder=''/>
-                                                </InputGroup>
-                                            </Td>
-                                        </Tr>
+                                        {associatedPayments.map((payment) => (<Tr key={payment.ID}>
+                                                <Td>Payment</Td>
+                                                <Td>{payment.Number}</Td>
+                                                <Td>{reformatDate(payment.Date)}</Td>
+                                                <Td>{payment.amount}</Td>
+                                                <Td>{payment.Balance}</Td>
+                                                <Td>
+                                                    <InputGroup>
+                                                        <InputLeftElement
+                                                            pointerEvents='none'
+                                                            color='gray.300'
+                                                            fontSize='1em'
+                                                            children='XAF'
+                                                        />
+                                                        <Input placeholder=''/>
+                                                    </InputGroup>
+                                                </Td>
+                                            </Tr>))}
                                     </Tbody>
                                 </Table>
                             </TableContainer>
@@ -101,7 +108,7 @@ export default function CreditsModal(props) {
                             <Divider/>
                             <Box w='60%' mt={6}>
                                 <FormControl>
-                                    <FormLabel>Amount to Credit: 0 XAF</FormLabel>
+                                    <FormLabel>Amount to Credit: {props.invoice.Balance}</FormLabel>
                                     <InputGroup>
                                         <InputLeftElement
                                             pointerEvents='none'
@@ -110,7 +117,7 @@ export default function CreditsModal(props) {
                                             w='40%'
                                             children='Invoice Balance Due:'
                                         />
-                                        <Input placeholder='' disabled='true'/>
+                                        <Input placeholder='' isDisabled={true}/>
                                     </InputGroup>
                                 </FormControl>
                             </Box>

@@ -3,7 +3,7 @@ import {
     Button,
     Center,
     Heading, IconButton, Menu,
-    MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Stack,
+    MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Spinner, Stack,
     Table,
     TableContainer,
     Tbody,
@@ -15,12 +15,14 @@ import {
 } from "@chakra-ui/react";
 import {HamburgerIcon, RepeatIcon} from "@chakra-ui/icons";
 import PaymentModal from "./Modals/PaymentModal";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {FaPenFancy, FaRegCircleXmark} from "react-icons/fa6";
 import DeletionModal from "./Modals/DeletionModal";
 import PaymentDetailsDrawer from "./Modals/PaymentDetailsDrawer";
 
 import {payments, paymentMode} from "../mock/data";
+
+import {getPayments} from "../services/api";
 
 export default function Payments() {
 
@@ -31,11 +33,23 @@ export default function Payments() {
     const [paymentData, setPaymentData] = useState(payments);
     const [singlePayment, setSinglePayment] = useState({});
 
+    useEffect(() => {
+        getPayments().then((response) => {
+            setPaymentData(response.data.map((payment) => {
+                return {
+                    ...payment,
+                    Date: new Date(payment.Date).toLocaleDateString().split('-').reverse().join('-'),
+                }
+            }))
+        })
+    }, []);
+
+
     return (
         <>
             <Center>
                 <Box border='1px' mt='50px' borderRadius='8' borderColor='gray.200' w='90%'>
-                    <TableContainer>
+                    {paymentData.length ? (<TableContainer>
                         <Table variant='striped' colorScheme='facebook'>
                             <Thead>
                                 <Tr>
@@ -44,7 +58,7 @@ export default function Payments() {
                                             <MenuButton
                                                 as={IconButton}
                                                 aria-label='Options'
-                                                icon={<HamburgerIcon />}
+                                                icon={<HamburgerIcon/>}
                                                 variant='outline'
                                             />
                                             <MenuList>
@@ -56,11 +70,13 @@ export default function Payments() {
                                                 <MenuDivider/>
                                                 <MenuGroup title='DEPOSITS'>
                                                     <MenuItem>Sales Receipt</MenuItem>
-                                                    <MenuItem onClick={() => setIsPaymentModalopened(!isPaymentModalopened)}>Customer Payment</MenuItem>
+                                                    <MenuItem
+                                                        onClick={() => setIsPaymentModalopened(!isPaymentModalopened)}>Customer
+                                                        Payment</MenuItem>
                                                     <MenuItem>transfer from Account</MenuItem>
                                                 </MenuGroup>
                                             </MenuList>
-                                        </Menu>
+                                        </Menu> Payments
                                     </Th>
                                     <Th></Th>
                                     <Th></Th>
@@ -82,32 +98,25 @@ export default function Payments() {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {paymentData.map((payment) => (<Tr>
-                                    <Td>{payment.paymentDate}</Td>
-                                    <Td>{payment.paymentNumber}</Td>
-                                    <Td>{payment.customer.customerName}</Td>
-                                    <Td>{payment.status}</Td>
-                                    <Td>{payment.paymentMode}</Td>
-                                    <Td>{payment.amount}</Td>
-                                    <Td>{payment.balance}</Td>
+                                {paymentData.map((payment) => (<Tr key={payment.ID}>
+                                    <Td>{payment.Date}</Td>
+                                    <Td>{payment.Number}</Td>
+                                    <Td>payment.customer.customerName</Td>
+                                    <Td>{payment.Status}</Td>
+                                    <Td>{payment.Fop}</Td>
+                                    <Td>{payment.Amount}</Td>
+                                    <Td>{payment.Balance}</Td>
                                     <Td>
                                         <Stack direction='row' spacing={6}>
-                                            <Button colorScheme='blue' size='sm' onClick={() => {
-                                                setIsDetailsOpened(!isDetailsOpened)
-                                                setSinglePayment(payment)
-                                            }}>
+                                            <Button colorScheme='blue' size='sm'>
                                                 <FaPenFancy/>
-                                            </Button>
-                                            <Button colorScheme='red' size='sm' onClick={() => setIsDeletionModalOpened(!isDeletionModalOpened)}
-                                                    onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}>
-                                                <FaRegCircleXmark/>
                                             </Button>
                                         </Stack>
                                     </Td>
                                 </Tr>))}
                             </Tbody>
                         </Table>
-                    </TableContainer>
+                    </TableContainer>) : (<Center><Spinner size='xl' /></Center>)}
                 </Box>
                 <PaymentModal isOpen={isPaymentModalopened} onClose={() => setIsPaymentModalopened(!isPaymentModalopened)}/>
                 <DeletionModal itemName='payment' isOpen={isDeletionModalOpened}

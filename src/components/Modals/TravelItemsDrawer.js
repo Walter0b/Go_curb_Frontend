@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {
+    AlertIcon,
     Box,
     Button, Center, Checkbox,
     Drawer,
@@ -13,6 +14,7 @@ import {
 } from "@chakra-ui/react";
 
 import {getTravelItems} from "../../services/api";
+import OBooksAlert from "./OBooksAlert";
 
 export default function TravelItemsDrawer(props) {
 
@@ -24,13 +26,18 @@ export default function TravelItemsDrawer(props) {
 
     const [travelItemData, setTravelItemData] = useState([]);
 
+    const isLoading = useRef(true);
     const travelItemsRef = useRef([]);
     const selectedTravelItemRef = useRef([]);
 
     useEffect(() => {
         getTravelItems().then((response) => {
-            travelItemsRef.current = response.data.map((item) => ({...item, checked: false}))
+            travelItemsRef.current = [];
+            response.data.forEach((item) => {
+                if (!item.IDInvoice) travelItemsRef.current.push({...item, checked: false})
+            })
             setTravelItemData(travelItemsRef.current)
+            isLoading.current = false
         })
     }, []);
 
@@ -53,7 +60,7 @@ export default function TravelItemsDrawer(props) {
                     <DrawerHeader borderBottomWidth='1px'>Select Sales Items to Invoice for xxxxx</DrawerHeader>
                     <DrawerBody>
                         <Box border='1px' borderColor='gray.200' borderRadius={8}>
-                            {travelItemsRef.current.length ? (<TableContainer>
+                            {(!isLoading.current && travelItemsRef.current.length) ? (<TableContainer>
                                 <Table variant='simple'>
                                     <Thead>
                                         <Tr>
@@ -73,11 +80,7 @@ export default function TravelItemsDrawer(props) {
                                             <Th></Th>
                                         </Tr>
                                         <Tr>
-                                            <Th>
-                                                <FormControl>
-                                                    <Checkbox size='md' colorScheme='green'></Checkbox>
-                                                </FormControl>
-                                            </Th>
+                                            <Th></Th>
                                             <Th>Items#</Th>
                                             <Th>Traveler</Th>
                                             <Th>Trip</Th>
@@ -103,7 +106,8 @@ export default function TravelItemsDrawer(props) {
                                         ))}
                                     </Tbody>
                                 </Table>
-                            </TableContainer>) : (<Center><Spinner size='xl' /></Center>)}
+                            </TableContainer>) : (<OBooksAlert icon={<AlertIcon/>} status='error' message='No travel items found' displayAlert={true}/>)}
+                            {isLoading.current && <Center><Spinner size='xl'/></Center>}
                         </Box>
                     </DrawerBody>
                 </DrawerContent>

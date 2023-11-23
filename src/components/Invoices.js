@@ -1,6 +1,8 @@
 import {
+    Alert,
+    AlertIcon,
     Box, Button,
-    Center,
+    Center, ScaleFade,
     Stack,
     Table,
     TableContainer,
@@ -11,16 +13,15 @@ import {
     Tr,
 } from "@chakra-ui/react";
 
-import {useState, useRef, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import InvoiceModal from "./Modals/InvoiceModal";
 import InvoiceDetailsDrawer from "./Modals/InvoiceDetailsDrawer";
 import CreditsModal from "./Modals/CreditsModal";
 import {FaPenFancy, FaRegCircleXmark} from "react-icons/fa6";
 import DeletionModal from "./Modals/DeletionModal";
 
-import { invoices } from "../mock/data";
-
 import {getInvoices} from "../services/api";
+import OBooksAlert from "./Modals/OBooksAlert";
 
 export default function Invoices() {
 
@@ -31,6 +32,7 @@ export default function Invoices() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isDeletionModalOpened, setIsDeletionModalOpened] = useState(false);
     const [invoicesData, setInvoicesData] = useState([]);
+    const [displayAlert, setDisplayAlert] = useState(false);
 
     useEffect( () => {
         getInvoices().then((response) => {
@@ -41,7 +43,7 @@ export default function Invoices() {
                     DueDate: new Date(inv.DueDate).toLocaleDateString().split('-').reverse().join('-'),
                 }
             }))
-        })
+        }).catch(() => setDisplayAlert(true))
     }, []);
 
 
@@ -65,7 +67,7 @@ export default function Invoices() {
                             <Thead>
                                 <Tr>
                                     <Th>
-                                        <Button onClick={() => setOpenModal(true)} colorScheme='blue'>New</Button>
+                                        <Button onClick={() => setOpenModal(true)} colorScheme='blue'>New</Button> Invoice
                                     </Th>
                                     <Th></Th>
                                     <Th></Th>
@@ -94,10 +96,10 @@ export default function Invoices() {
                                         <Td>{invoice.DueDate}</Td>
                                         <Td>
                                             <Stack direction='row' spacing={6}>
-                                                <Button colorScheme='blue' size='sm' onClick={() => openDetailDrawer(invoice,true, true)}>
+                                                <Button colorScheme='blue' size='sm'>
                                                     <FaPenFancy/>
                                                 </Button>
-                                                <Button colorScheme='red' size='sm' onClick={() => deleteInvoice(invoice)}
+                                                <Button colorScheme='red' size='sm'
                                                         onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}>
                                                     <FaRegCircleXmark/>
                                                 </Button>
@@ -115,11 +117,12 @@ export default function Invoices() {
                                       invoice={singleInvoice}
                                       onClose={() => setIsDetailsOpened(!isDetailsOpened)}
                                       onOpenCreditModal={() => setIsCreditOpened(!isCreditOpened)}/>
-                <CreditsModal isOpen={isCreditOpened} onClose={() => setIsCreditOpened(!isCreditOpened)}/>
+                <CreditsModal isOpen={isCreditOpened} invoice={singleInvoice} onClose={() => setIsCreditOpened(!isCreditOpened)}/>
                 <DeletionModal itemName='invoice' itemId={singleInvoice.id}
                                isOpen={isDeletionModalOpened}
                                onClose={() => setIsDeletionModalOpened(!isDeletionModalOpened)}
                 />
+                {displayAlert && <OBooksAlert icon={<AlertIcon/>} status='error' message='Error while retrieving invoices' displayAlert={displayAlert}/>}
             </Center>
         </>
     )

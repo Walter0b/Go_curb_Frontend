@@ -1,5 +1,5 @@
 import {
-    Box, Button, Center,
+    Box, Button,
     Flex,
     FormControl, FormLabel, Input, InputGroup, InputLeftElement, Modal,
     ModalBody,
@@ -8,21 +8,59 @@ import {
     ModalHeader,
     ModalOverlay, Select, Text, useDisclosure
 } from "@chakra-ui/react";
-import TravelItems from "../TravelItems";
-import TravelItemsDrawer from "./TravelItemsDrawer";
-import {useRef} from "react";
-import RelatedInvoices from "../RelatedInvoices";
+
+import {useEffect, useRef, useState} from "react";
+
+import {getCustomers, postPayment} from "../../services/api";
+import {paymentMode} from "../../mock/data";
+import {putCurrenToOriginalState} from "../../utils/utilsMethods";
 
 export default function PaymentModal(props) {
 
     const { isOpen, onOpen, onClose } = useDisclosure({
         isOpen: props.isOpen,
         onOpen: () =>  void 0,
-        onClose: () => props.onClose()
+        onClose: () => {
+            setAmount(0)
+            props.onClose()
+        }
     })
+
+    const [customersData, setCustomersData] = useState([]);
+    const [paymentModes, setPaymentModes] = useState(paymentMode);
+    const [amount, setAmount] = useState(0);
 
     const initialRef = useRef(null)
     const finalRef = useRef(null)
+    const amountRef = useRef(null)
+    const paymentModeRef = useRef(null)
+    const customerIdRef = useRef(null);
+
+    const handleChange = (e) => {
+        e.target.name === 'Amount' && setAmount((e.target.value === '' ? 0 : e.target.value))
+    }
+
+    const save = (e) => {
+        e.preventDefault();
+        const paymentInfos = {
+            IdCustomer: customerIdRef.current.value,
+            Fop: paymentModeRef.current.value,
+            Amount: amountRef.current.value
+        }
+        postPayment(paymentInfos).then((response) => {
+            onClose()
+        })
+            .catch((error) => {
+                console.log(error)
+            })
+    }
+
+    useEffect(() => {
+        getCustomers().then((response) => {
+            setCustomersData(response.data)
+        })
+    }, []);
+
 
     return (
         <>
@@ -34,79 +72,72 @@ export default function PaymentModal(props) {
                 size='full'
             >
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>New Payment Received</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody pb={6}>
-                        <Text fontSize='20px' color='green' mb={1}>
-                            0 XAF
-                        </Text>
-                        <Text fontSize='15px' color='black.300' mb={5}>
-                            Over Payment
-                        </Text>
-                        <Flex alignItems='horizontal' gap='5' minWidth='max-content'>
-                            <Box w='100%' p={4}>
-                                <FormControl>
-                                    <FormLabel>Deposit To</FormLabel>
-                                    <Select placeholder='Select option'>
-                                        <option value='option1'>Option 1</option>
-                                        <option value='option2'>Option 2</option>
-                                        <option value='option3'>Option 3</option>
-                                    </Select>
-                                </FormControl>
-                                <FormControl>
-                                    <FormLabel>Payment Mode</FormLabel>
-                                    <Select placeholder='Select option'>
-                                        <option value='option1'>Option 1</option>
-                                        <option value='option2'>Option 2</option>
-                                        <option value='option3'>Option 3</option>
-                                    </Select>
-                                </FormControl>
-                                <FormControl>
-                                    <FormLabel>Amount</FormLabel>
-                                    <InputGroup>
-                                        <InputLeftElement
-                                            pointerEvents='none'
-                                            color='gray.300'
-                                            fontSize='1em'
-                                            children='XAF'
-                                        />
-                                        <Input placeholder='Enter amount'/>
-                                    </InputGroup>
-                                </FormControl>
-                            </Box>
-                            <Box w='100%' bgColor='gray.50' p={4} borderRadius={8}>
-                                <Flex alignItems='vertical' gap='3'>
+                <form onSubmit={save}>
+                    <ModalContent>
+                        <ModalHeader>New Payment Received</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody pb={6}>
+                            <Text fontSize='20px' color='green' mb={1}>
+                                {`${putCurrenToOriginalState(amount)} XAF`}
+                            </Text>
+                            <Text fontSize='15px' color='black.300' mb={5}>
+                                Over Payment
+                            </Text>
+                            <Flex alignItems='horizontal' gap='5' minWidth='max-content'>
+                                <Box w='100%' p={4}>
                                     <FormControl>
-                                        <FormLabel>Customer Account</FormLabel>
-                                        <Select placeholder='Select option'>
-                                            <option value='option1'>Option 1</option>
-                                            <option value='option2'>Option 2</option>
-                                            <option value='option3'>Option 3</option>
+                                        <FormLabel>Payment Mode</FormLabel>
+                                        <Select name='Fop'
+                                                placeholder='Select a payment mode'
+                                                ref={paymentModeRef} onChange={handleChange}>
+                                            {paymentModes.map((pm) => <option value={pm}>{pm}</option>)}
                                         </Select>
                                     </FormControl>
-
                                     <FormControl>
-                                        <FormLabel>Customer Name</FormLabel>
-                                        <Input placeholder='Customer Name' />
+                                        <FormLabel>Amount</FormLabel>
+                                        <InputGroup>
+                                            <InputLeftElement
+                                                pointerEvents='none'
+                                                color='gray.300'
+                                                fontSize='1em'
+                                                children='XAF'
+                                            />
+                                            <Input placeholder='Enter an amount'
+                                                   name='Amount'
+                                                   ref={amountRef}
+                                                   onChange={handleChange}/>
+                                        </InputGroup>
                                     </FormControl>
-                                    <FormControl>
-                                        <FormLabel>Customer Email</FormLabel>
-                                        <Input placeholder='Customer Email' />
-                                    </FormControl>
-                                </Flex>
-                            </Box>
-                        </Flex>
-                        <RelatedInvoices/>
-                    </ModalBody>
+                                </Box>
+                                <Box w='100%' bgColor='gray.50' p={4} borderRadius={8}>
+                                    <Flex alignItems='vertical' gap='3'>
+                                        <FormControl>
+                                            <FormLabel>Customer Account</FormLabel>
+                                            <Select placeholder='Select a customer' name='IdCustomer'
+                                                    ref={customerIdRef} onChange={handleChange}>
+                                                {customersData.map((customer) => <option value={customer.ID} key={customer.ID}>{customer.Customer_name}</option>)}
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl>
+                                            <FormLabel>Payment Number</FormLabel>
+                                            <Input placeholder='PMR-4' isDisabled={true}/>
+                                        </FormControl>
+                                    </Flex>
+                                </Box>
+                            </Flex>
+                            {/*<RelatedInvoices/>*/}
+                        </ModalBody>
 
-                    <ModalFooter>
-                        <Button colorScheme='blue' mr={3}>
-                            Save
-                        </Button>
-                        <Button onClick={onClose}>Cancel</Button>
-                    </ModalFooter>
-                </ModalContent>
+                        <ModalFooter>
+                            <Button type='submit'
+                                    colorScheme='blue'
+                                    mr={3} isDisabled={(amount <= 0) || !customerIdRef.current?.value || !paymentModeRef.current?.value}>
+                                Save
+                            </Button>
+                            <Button onClick={onClose}>Cancel</Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </form>
             </Modal>
         </>
     )

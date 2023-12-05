@@ -1,6 +1,7 @@
 import {
     Box,
-    Button, Divider,
+    Button,
+    Divider,
     Flex,
     FormControl,
     FormLabel,
@@ -16,40 +17,89 @@ import {
     ModalOverlay,
     Select,
     Table,
-    TableContainer, Tbody, Td,
+    TableContainer,
+    Tbody,
+    Td,
     Text,
     Th,
     Thead,
     Tr,
-    useDisclosure
+    useDisclosure,
 } from "@chakra-ui/react";
-import {useEffect, useRef, useState} from "react";
-import {getImputations, getSingleCustomerInfo} from "../../services/api";
-import {reformatDate} from "../../utils/utilsMethods";
+import { useEffect, useRef, useState } from "react";
+import {
+    getImputations,
+    postImputations,
+    getSingleCustomerInfo,
+} from "../../services/api";
+import { reformatDate } from "../../utils/utilsMethods";
 
 export default function CreditsModal(props) {
-
     const { isOpen, onOpen, onClose } = useDisclosure({
         isOpen: props.isOpen,
-        onOpen: () =>  void 0,
-        onClose: () => props.onClose()
-    })
+        onOpen: () => void 0,
+        onClose: () => {
+            setSelectedPaymentAmounts({});
+            setCreditAmount("");
+            props.onClose();
+        },
+    });
+    const [selectedPaymentAmounts, setSelectedPaymentAmounts] = useState({});
+
+    const [creditAmount, setCreditAmount] = useState("");
 
     const [associatedPayments, setAssociatedPayments] = useState([]);
 
-    const initialRef = useRef(null)
-    const finalRef = useRef(null)
+    const initialRef = useRef(null);
+    const finalRef = useRef(null);
 
     useEffect(() => {
         getImputations().then((response) => {
-            //console.log(response.data)
-        })
-        getSingleCustomerInfo(props.invoice.CustomerID, 'Payments').then((response) => {
-            console.log(response)
-            setAssociatedPayments(response.Payments.Payments)
-        }).catch(() => {})
+            // console.log(response.data)
+        });
+
+        getSingleCustomerInfo(props?.invoice?.CustomerID, "Payments")
+            .then((response) => {
+                // console.log(props.invoice)
+                setAssociatedPayments(response.data[0].Payments);
+            })
+            .catch(() => { });
     }, [props?.invoice]);
 
+    const handlePaymentAmountChange = (paymentId, amount) => {
+        setSelectedPaymentAmounts((prevSelectedAmounts) => ({
+            ...prevSelectedAmounts,
+            [paymentId]: amount,
+        }));
+        setCreditAmount(amount);
+    };
+
+    const handleApplyCredits = async () => {
+        if (selectedPaymentAmounts.length === 0 || !creditAmount) {
+            console.log("No payments selected or creditAmount is empty");
+            return;
+        }
+
+        const imputations = Object.entries(selectedPaymentAmounts).map(
+            ([paymentId, amount]) => ({
+                IDInvoice: props.invoice.ID,
+                IDPaymentReceived: parseInt(paymentId),
+                AmountApply: amount,
+            })
+        );
+
+        try {
+
+
+            const response = await postImputations(imputations);
+
+            console.log(imputations);
+            console.log(response);
+
+            // After successfully applying credits, you may want to update the UI or close the modal
+            onClose();
+        } catch (error) { }
+    };
 
     return (
         <>
@@ -58,19 +108,19 @@ export default function CreditsModal(props) {
                 finalFocusRef={finalRef}
                 isOpen={isOpen}
                 onClose={onClose}
-                size='full'
+                size="full"
             >
                 <ModalOverlay />
                 <ModalContent>
                     <ModalHeader>Apply credits to {props.invoice.InvoiceNumber}</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        <Text fontSize='15px' color='black.300' mb={5}>
+                        <Text fontSize="15px" color="black.300" mb={5}>
                             Invoice Balance: {props.invoice.Balance}
                         </Text>
-                        <Box border='1px' mt={5} borderRadius='8' borderColor='gray.200' w='100%'>
+                        <Box border="1px" mt={5} borderRadius="8" borderColor="gray.200" w="100%">
                             <TableContainer>
-                                <Table variant='simple'>
+                                <Table variant="simple">
                                     <Thead>
                                         <Tr>
                                             <Th>From</Th>
@@ -82,43 +132,52 @@ export default function CreditsModal(props) {
                                         </Tr>
                                     </Thead>
                                     <Tbody>
-                                        {associatedPayments.map((payment) => (<Tr key={payment.ID}>
+                                        {associatedPayments.map((payment) => (
+                                            <Tr key={payment.ID}>
                                                 <Td>Payment</Td>
                                                 <Td>{payment.Number}</Td>
                                                 <Td>{reformatDate(payment.Date)}</Td>
-                                                <Td>{payment.amount}</Td>
+                                                <Td>{payment.Amount}</Td>
                                                 <Td>{payment.Balance}</Td>
                                                 <Td>
                                                     <InputGroup>
                                                         <InputLeftElement
-                                                            pointerEvents='none'
-                                                            color='gray.300'
-                                                            fontSize='1em'
-                                                            children='XAF'
+                                                            pointerEvents="none"
+                                                            color="gray.300"
+                                                            fontSize="1em"
+                                                            children="XAF"
                                                         />
-                                                        <Input placeholder=''/>
+                                                        <Input
+                                                            defaultValue={payment.UsedAmount.substring(1)
+                                                            }
+                                                            onChange={(e) =>
+                                                                handlePaymentAmountChange(payment.ID, e.target.value)
+                                                            }
+                                                            type="money"
+                                                        />
                                                     </InputGroup>
                                                 </Td>
-                                            </Tr>))}
+                                            </Tr>
+                                        ))}
                                     </Tbody>
                                 </Table>
                             </TableContainer>
                         </Box>
                         <Flex>
                             <span></span>
-                            <Divider/>
-                            <Box w='60%' mt={6}>
+                            <Divider />
+                            <Box w="60%" mt={6}>
                                 <FormControl>
                                     <FormLabel>Amount to Credit: {props.invoice.Balance}</FormLabel>
                                     <InputGroup>
                                         <InputLeftElement
-                                            pointerEvents='none'
-                                            color='gray.300'
-                                            fontSize='1em'
-                                            w='40%'
-                                            children='Invoice Balance Due:'
+                                            pointerEvents="none"
+                                            color="gray.300"
+                                            fontSize="1em"
+                                            w="40%"
+                                            children="Invoice Balance Due:"
                                         />
-                                        <Input placeholder='' isDisabled={true}/>
+                                        <Input placeholder="" isDisabled={true} />
                                     </InputGroup>
                                 </FormControl>
                             </Box>
@@ -126,7 +185,7 @@ export default function CreditsModal(props) {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button colorScheme='red' mr={3}>
+                        <Button colorScheme="red" mr={3} onClick={handleApplyCredits}>
                             Apply credits
                         </Button>
                         <Button onClick={onClose}>Cancel</Button>
@@ -134,5 +193,5 @@ export default function CreditsModal(props) {
                 </ModalContent>
             </Modal>
         </>
-    )
+    );
 }

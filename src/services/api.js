@@ -21,7 +21,7 @@ export async function getImputations() {
 }
 
 export async function getSingleCustomerInfo(id, associatedItem) {
-    return (await fetch(`${url}customer?embed=${associatedItem}&id=${id}`)).json();
+    return (await fetch(`${url}customers?embed=${associatedItem}&id=${id}`)).json();
 }
 
 export async function postPayment(payment) {
@@ -41,5 +41,14 @@ export async function postInvoice(invoice) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(invoice)
+    })).json();
+}
+export async function postImputations(imputations) {
+    return (await fetch(`${url}imputations`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(imputations)
     })).json();
 }

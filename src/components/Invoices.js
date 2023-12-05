@@ -22,6 +22,7 @@ import DeletionModal from "./Modals/DeletionModal";
 
 import {getInvoices} from "../services/api";
 import OBooksAlert from "./Modals/OBooksAlert";
+import {reformatDate} from "../utils/utilsMethods";
 
 export default function Invoices() {
 
@@ -39,23 +40,18 @@ export default function Invoices() {
             setInvoicesData(response.data.map((inv) => {
                 return {
                     ...inv,
-                    CreationDate: new Date(inv.CreationDate).toLocaleDateString().split('-').reverse().join('-'),
-                    DueDate: new Date(inv.DueDate).toLocaleDateString().split('-').reverse().join('-'),
+                    CreationDate: reformatDate(new Date(inv.CreationDate)),
+                    DueDate: reformatDate(new Date(inv.DueDate)),
                 }
             }))
         }).catch(() => setDisplayAlert(true))
-    }, []);
+    }, [!openModal]);
 
 
     const openDetailDrawer = (invoice, isOpen, isInEditMode) => {
         setIsEditMode(isInEditMode)
         setSingleInvoice({...invoice})
         setIsDetailsOpened(isOpen)
-    }
-
-    const deleteInvoice = (invoice) => {
-        setSingleInvoice(invoice)
-        setIsDeletionModalOpened(!isDeletionModalOpened)
     }
 
     return (

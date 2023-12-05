@@ -13,7 +13,7 @@ import {useEffect, useRef, useState} from "react";
 
 import {getCustomers, postPayment} from "../../services/api";
 import {paymentMode} from "../../mock/data";
-import {putCurrenToOriginalState} from "../../utils/utilsMethods";
+import {putCurrencyToOriginalState} from "../../utils/utilsMethods";
 
 export default function PaymentModal(props) {
 
@@ -43,11 +43,13 @@ export default function PaymentModal(props) {
     const save = (e) => {
         e.preventDefault();
         const paymentInfos = {
-            IdCustomer: customerIdRef.current.value,
+            CustomerId: parseInt(customerIdRef.current.value),
             Fop: paymentModeRef.current.value,
             Amount: amountRef.current.value
         }
+        console.log(paymentInfos)
         postPayment(paymentInfos).then((response) => {
+            console.log(response)
             onClose()
         })
             .catch((error) => {
@@ -78,7 +80,7 @@ export default function PaymentModal(props) {
                         <ModalCloseButton />
                         <ModalBody pb={6}>
                             <Text fontSize='20px' color='green' mb={1}>
-                                {`${putCurrenToOriginalState(amount)} XAF`}
+                                {`${putCurrencyToOriginalState(amount)} XAF`}
                             </Text>
                             <Text fontSize='15px' color='black.300' mb={5}>
                                 Over Payment
@@ -109,7 +111,7 @@ export default function PaymentModal(props) {
                                         </InputGroup>
                                     </FormControl>
                                 </Box>
-                                <Box w='100%' bgColor='gray.50' p={4} borderRadius={8}>
+                                <Box w='70%' bgColor='gray.50' p={4} borderRadius={8}>
                                     <Flex alignItems='vertical' gap='3'>
                                         <FormControl>
                                             <FormLabel>Customer Account</FormLabel>
@@ -117,10 +119,6 @@ export default function PaymentModal(props) {
                                                     ref={customerIdRef} onChange={handleChange}>
                                                 {customersData.map((customer) => <option value={customer.ID} key={customer.ID}>{customer.Customer_name}</option>)}
                                             </Select>
-                                        </FormControl>
-                                        <FormControl>
-                                            <FormLabel>Payment Number</FormLabel>
-                                            <Input placeholder='PMR-4' isDisabled={true}/>
                                         </FormControl>
                                     </Flex>
                                 </Box>

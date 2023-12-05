@@ -16,7 +16,7 @@ import TravelItemsDrawer from "./TravelItemsDrawer";
 
 import {customers} from "../../mock/data";
 import {getCustomers, postInvoice} from "../../services/api";
-import {putCurrenToOriginalState} from "../../utils/utilsMethods";
+import {putCurrencyToOriginalState, putDateToDBReady} from "../../utils/utilsMethods";
 
 export default function InvoiceModal(props) {
 
@@ -51,10 +51,6 @@ export default function InvoiceModal(props) {
         })
     }, []);
 
-    const onAccountSelection = (value) => {
-        setSelectedAccount(customersData.find(cust => cust.ID === +value));
-        setCusName(customersData.find(cust => cust.ID === +value).Customer_name)
-    }
     const handleAddTravelItems = (items) => {
         setSelectedTravelItems(items)
     }
@@ -72,16 +68,19 @@ export default function InvoiceModal(props) {
     const save = (e) => {
         e.preventDefault();
         const invoiceInfos = {
-            idCustomer: customerIdRef.current.value,
-            duDate: dueDateRef.current.value.split('-').reverse().join('-'),
-            amount: putCurrenToOriginalState(selectedTravelItems.reduce((sum, item) => sum + Number(item.TotalPrice.replace(/[^0-9.-]+/g,"")), 0)),
+            customerId: parseInt(customerIdRef.current.value),
+            dueDate: dueDateRef.current.value,
+            amount: putCurrencyToOriginalState(selectedTravelItems.reduce((sum, item) => sum + Number(item.TotalPrice.replace(/[^0-9.-]+/g,"")), 0)),
             travelItems: selectedTravelItems.map((item) => {return {ID: item.ID, TotalPrice: item.TotalPrice}})
         }
         console.log(invoiceInfos)
-        // postInvoice(invoiceInfos).then((response) => console.log('response'))
-        //     .catch((error) => {
-        //         console.log(error)
-        //     })
+        postInvoice(invoiceInfos).then((response) => {
+            console.log(response)
+            onClose()
+        })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     return (
@@ -102,7 +101,7 @@ export default function InvoiceModal(props) {
                         <ModalCloseButton />
                         <ModalBody pb={4}>
                             <Text fontSize='20px' color='tomato' mb={1}>
-                                {`${putCurrenToOriginalState(selectedTravelItems.reduce((sum, item) => sum + Number(item.TotalPrice.replace(/[^0-9.-]+/g,"")), 0))} XAF`}
+                                {`${putCurrencyToOriginalState(selectedTravelItems.reduce((sum, item) => sum + Number(item.TotalPrice.replace(/[^0-9.-]+/g,"")), 0))} XAF`}
                             </Text>
                             <Text fontSize='15px' color='black.300' mb={5}>
                                 Balance due

@@ -28,9 +28,6 @@ export default function PaymentDetailsDrawer(props) {
 
     const [amount, setAmount] = useState(0);
 
-    const initialRef = useRef(null)
-    const finalRef = useRef(null)
-
     return (
         <>
             <Drawer onClose={onClose} isOpen={isOpen} size={size}>

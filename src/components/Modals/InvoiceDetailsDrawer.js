@@ -7,39 +7,25 @@ import {
     DrawerContent,
     DrawerHeader,
     DrawerOverlay,
-    Flex,
     FormControl,
     FormLabel,
-    IconButton,
     Input,
-    InputGroup,
-    InputLeftElement, Menu,
+    Menu,
     MenuButton, MenuDivider,
     MenuGroup,
     MenuItem,
     MenuList,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
     Select,
     Text,
     useDisclosure
 } from "@chakra-ui/react";
-import RelatedInvoices from "../RelatedInvoices";
-import {useEffect, useRef, useState} from "react";
-import {ChevronDownIcon, HamburgerIcon} from "@chakra-ui/icons";
-import {customers, travelItems} from "../../mock/data";
-import TravelItems from "../TravelItems";
-import TravelItemsDrawer from "./TravelItemsDrawer";
+import { useRef, useState} from "react";
+import {ChevronDownIcon} from "@chakra-ui/icons";
+import {customers} from "../../mock/data";
 
 export default function InvoiceDetailsDrawer(props) {
 
     const [size, setSize] = useState('lg')
-    const [invoiceDetails, setInvoiceDetails] = useState({});
 
     const { isOpen, onOpen, onClose } = useDisclosure({
         isOpen: props.isOpen,
@@ -127,18 +113,6 @@ export default function InvoiceDetailsDrawer(props) {
                                 <Input type='date' placeholder='Due Date' value={date}
                                        onChange={(e) => setDate(e.target.value)}/>
                             </FormControl>
-                            {/*<Center>*/}
-                            {/*    <Box mt={8} w='80%' border='1px' borderColor='gray.200' borderRadius={8}>*/}
-                            {/*        <TravelItems*/}
-                            {/*            travelItems={selectedTravelItems}*/}
-                            {/*            updateSelectedTravelItems={(id) => removeTravelItemFromList(id)}*/}
-                            {/*            onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>*/}
-                            {/*    </Box>*/}
-                            {/*    <TravelItemsDrawer isDrawerOpen={isTravelItemDrawerOpen}*/}
-                            {/*                       travelItems={selectedTravelItems}*/}
-                            {/*                       onAddTravelItems={handleAddTravelItems}*/}
-                            {/*                       onSetDrawerState={() => setIsTravelItemDrawerOpen(!isTravelItemDrawerOpen)}/>*/}
-                            {/*</Center>*/}
                         </form>) :
                             (<Center>
                                 <Box></Box>

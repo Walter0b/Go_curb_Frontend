@@ -42,9 +42,10 @@ export default function CreditsModal(props) {
 
     useEffect(() => {
         getImputations().then((response) => {
-            console.log(response.data)
+            //console.log(response.data)
         })
         getSingleCustomerInfo(props.invoice.CustomerID, 'Payments').then((response) => {
+            console.log(response)
             setAssociatedPayments(response.Payments.Payments)
         }).catch(() => {})
     }, [props?.invoice]);

@@ -110,6 +110,6 @@ const travelItems = [
     },
 ]
 
-const paymentMode = ['Bank Transfer', 'Cash', 'Cheque', 'Mobile Money', 'Pos'];
+const paymentMode = ['bank transfer', 'cash', 'cheque', 'mobile money', 'pos'];
 
 export { customers, invoices, payments, paymentMode, travelItems }

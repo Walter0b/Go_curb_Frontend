@@ -23,6 +23,7 @@ import PaymentDetailsDrawer from "./Modals/PaymentDetailsDrawer";
 import {payments, paymentMode} from "../mock/data";
 
 import {getPayments} from "../services/api";
+import {reformatDate} from "../utils/utilsMethods";
 
 export default function Payments() {
 
@@ -38,11 +39,11 @@ export default function Payments() {
             setPaymentData(response.data.map((payment) => {
                 return {
                     ...payment,
-                    Date: new Date(payment.Date).toLocaleDateString().split('-').reverse().join('-'),
+                    Date: reformatDate(payment.Date)
                 }
             }))
         })
-    }, []);
+    }, [!isPaymentModalopened]);
 
 
     return (

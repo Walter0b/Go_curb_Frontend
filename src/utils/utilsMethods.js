@@ -2,7 +2,11 @@ const reformatDate = (date) => {
     return new Date(date).toLocaleDateString().split('-').reverse().join('-')
 }
 
-const putCurrenToOriginalState = (currency) => {
+const putDateToDBReady = (date) => {
+    return date.split('-').reverse().join('-')
+}
+
+const putCurrencyToOriginalState = (currency) => {
      return currency.toLocaleString('en-US', {
         style: 'decimal',
         minimumFractionDigits: 2,
@@ -10,4 +14,4 @@ const putCurrenToOriginalState = (currency) => {
     })
 }
 
-export {reformatDate, putCurrenToOriginalState}
+export {reformatDate, putDateToDBReady, putCurrencyToOriginalState}

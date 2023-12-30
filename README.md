@@ -1,41 +1,49 @@
 # React + TypeScript + Vite
 
-
 project-root/
 ├── src/
 │   ├── components/
 │   │   ├── Table/
-│   │   │   ├── Table.ts
-│   │   │   └── TableItem.ts
+│   │   │   ├── Table.tsx
+│   │   │   └── TableItem.tsx
 │   │   ├── Modal/
-│   │   │   ├── Modal.ts
-│   │   │   └── Form.ts
+│   │   │   ├── Modal.tsx
+│   │   │   └── Form.tsx
 │   │   └── ...
 │   ├── pages/
 │   │   ├── HomePage/
-│   │   │   ├── HomePage.ts
+│   │   │   ├── HomePage.tsx
 │   │   │   └── HomePage.css
 │   │   ├── TablePage/
-│   │   │   ├── TablePage.ts
-│   │   │   └── TableContainer.ts
+│   │   │   ├── TablePage.tsx
+│   │   │   └── TableContainer.tsx
 │   │   └── ...
 │   ├── api/
-│   │   ├── api.ts
-│   │   └── endpoints.ts
+│   │   ├── api.tsx
+│   │   └── endpoints.tsx
 │   ├── utils/
-│   │   ├── helpers.ts
+│   │   ├── helpers.tsx
+│   │   └── ...
+│   ├── store/
+│   │   ├── actions/
+│   │   │   ├── tableActions.tsx
+│   │   │   └── ...
+│   │   ├── reducers/
+│   │   │   ├── tableReducer.tsx
+│   │   │   └── ...
+│   │   ├── store.tsx
 │   │   └── ...
 │   ├── styles/
 │   │   ├── tailwind.css
 │   │   └── ...
-│   ├── App.ts
-│   ├── index.ts
+│   ├── App.tsx
+│   ├── index.tsx
 │   └── index.css
 ├── public/
 │   ├── index.html
 │   └── ...
 ├── .gitignore
-├── package.json
+├── package.tsxon
 └── README.md
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -55,12 +63,12 @@ If you are developing a production application, we recommend updating the config
 export default {
   // other rules...
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.tson', './tsconfig.node.tson'],
+    ecmaVersion: "latest",
+    sourceType: "module",
+    project: ["./tsconfig.tson", "./tsconfig.node.tson"],
     tsconfigRootDir: __dirname,
   },
-}
+};
 ```
 
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`

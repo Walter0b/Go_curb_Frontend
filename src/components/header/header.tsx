@@ -13,7 +13,7 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     return (
-        <header className="bg-gray-900">
+        <header className="w-screen bg-gray-900">
             <nav className="mx-auto flex max-w-8xl items-center justify-between p-6 px-8" aria-label="Global">
                 <div className="flex lg:hidden">
 

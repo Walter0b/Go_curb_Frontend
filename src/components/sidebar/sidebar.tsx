@@ -27,7 +27,7 @@ const teams = [
 
 export default function SideBare() {
     return (
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
+        <div className="flex h-screen grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
 
             <nav className="flex flex-1 mt-6 flex-col">
                 <SideBareItems navigation={navigation} teams={teams} />

@@ -1,4 +1,5 @@
-import { Outlet, NavLink } from "react-router-dom";
+import Background from "@assets/background";
+import { NavLink } from "react-router-dom";
 
 export default function RootLayout() {
   return (
@@ -11,7 +12,7 @@ export default function RootLayout() {
         </nav>
       </header>
       <main>
-        <Outlet />
+        <Background/>
       </main>
     </div>
   )

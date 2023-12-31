@@ -10,6 +10,8 @@ export const fetchData = async ({ endpoint, method = 'GET', body }: FetchDataOpt
   const baseEndpoint = import.meta.env.VITE_API_BASE_URL;
   const fullEndpoint = `${baseEndpoint}${endpoint}`;
 
+  console.log("endpoint: " + fullEndpoint)
+
   const config: RequestInit = {
     method,
     headers: {

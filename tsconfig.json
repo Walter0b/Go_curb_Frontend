@@ -10,7 +10,7 @@
       "@ui/*": ["./components/common/ui/*"],
       "@pages/*": ["./src/pages/*"],
       "@hooks/*": ["./hooks/*"],
-      "@api/*": ["./api/*"],
+      "@api/*": ["./src/api/*"],
       "@assets/*": ["./src/assets/*"],
       "@utils/*": ["./src/utils/*"]
     },

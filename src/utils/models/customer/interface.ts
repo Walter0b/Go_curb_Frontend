@@ -1,4 +1,4 @@
-export interface User {
+export interface Customers {
     ID: number,
     Customer_name: string,    
     City: string,
@@ -9,7 +9,7 @@ export interface User {
     Id_country: number,
 }
 
-export interface userData {
+export interface CustomerData {
     id: number;
     isClicked: boolean;
     isEditing: boolean;
@@ -25,7 +25,7 @@ export interface Country {
 }
 
 export
-    const emptyUser: User = {
+    const emptyUser: Customers = {
         ID: 0,
         Customer_name: "",
         City: "",

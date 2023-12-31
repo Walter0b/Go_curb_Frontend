@@ -1,4 +1,4 @@
-export const columns = [
+export const CustomersColumns = [
     { key: 'ID', label: 'id' },
     { key: 'Customer_name', label: 'Name' },
     { key: 'City', label: 'City' },

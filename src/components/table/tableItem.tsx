@@ -1,15 +1,47 @@
-import { columns } from '@utils/models/customer/struc';
-import { userData, User } from '@utils/models/customer/interface';
 import { useState } from 'react';
-
-
-export function TableItem(data: unknown) {
-
-  const [newData, setNewData] = useState<userData[]>([]);
-
+import Pagination from './pagination';
+interface DataTableProps<T> {
+  data: T[];
+  columns: Column[];
+  onEdit?: (item: T) => void;
+  onDelete?: (item: T) => void;
+}
+interface Column {
+  key: string;
+  label: string;
+}
+export function TableItem<T>({ data, columns, onEdit, onDelete }: DataTableProps<T>) {
   const [isCheckedAll, setCheckedAll] = useState(false);
-  const [isHovered, setHovered] = useState<number>(0);
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+
+
   const [searchTerm, setSearchTerm] = useState('');
+
+  const handleCheckboxAllChange = () => {
+    const allChecked = !isCheckedAll;
+    setCheckedAll(allChecked);
+
+    // Update the state of individual checkboxes based on the state of checkbox-all
+    const updatedCheckedItems: Record<string, boolean> = {};
+    data.forEach((_, index) => {
+      updatedCheckedItems[index.toString()] = allChecked;
+    });
+    setCheckedItems(updatedCheckedItems);
+  };
+
+
+  const handleCheckboxChange = (index: number) => {
+
+    const updatedCheckedItems = { ...checkedItems, [index.toString()]: !checkedItems[index.toString()] };
+    setCheckedItems(updatedCheckedItems);
+    console.log(updatedCheckedItems)
+    // Check if all individual checkboxes are checked
+    const allChecked = Object.values(updatedCheckedItems).every((isChecked) => isChecked);
+    !(Object.values(updatedCheckedItems).length == 1) && setCheckedAll(allChecked);
+  };
+
+
 
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,12 +51,12 @@ export function TableItem(data: unknown) {
 
 
 
+
   const handleAddClick = () => {
     console.log('handleAddClick')
   };
 
 
-  console.log(newData)
   return (
     <div className='flex flex-col overscroll-none items-center p-12'>
 
@@ -36,14 +68,14 @@ export function TableItem(data: unknown) {
 
               Filter
               <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
               </svg>
             </button>
             {/* ... */}
             {/* Delete Button here */}
-            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" 
-            // onClick={() => handleDelete}
-             className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio"
+              // onClick={() => handleDelete}
+              className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
 
               Delete
 
@@ -74,30 +106,23 @@ export function TableItem(data: unknown) {
           </div>
         </div>
         <div className='table-container overflow-x-auto overscroll-none' style={{ maxHeight: '400px' }}>
-          <table className=" table w-fit text-sm text-left  text-gray-500 dark:text-gray-400">
+          <table className="table w-fit text-sm text-left text-gray-500 dark:text-gray-400">
+            {/* Table header */}
             <thead className="text-xs sticky top-0 z-10 text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
               <tr>
                 <th scope="col w-1/3" className="p-4">
                   <div className="flex items-center">
                     <input
-                      id="checkbox-all-search"
+                      id="checkbox-all"
                       type="checkbox"
                       checked={isCheckedAll}
-                      onChange={() => {
-                        const updatedData = newData.map((user) => ({
-                          ...user,
-                          isClicked: !isCheckedAll,
-                        }));
-                        setNewData(updatedData);
-                        setCheckedAll(!isCheckedAll);
-                      }}
+                      onChange={handleCheckboxAllChange}
                     />
-
                     <label className="sr-only">checkbox</label>
                   </div>
                 </th>
-                {columns.map((column) => (
-                  <th scope="col" className="px-6 py-3" key={column.key}>
+                {columns.map((column: Column) => (
+                  <th key={column.key} scope="col" className="px-6 py-3">
                     {column.label}
                   </th>
                 ))}
@@ -106,81 +131,56 @@ export function TableItem(data: unknown) {
                 </th>
               </tr>
             </thead>
-            <tbody className=''>
-              {/* Table content */}
+            {/* Table body */}
+            <tbody>
+              {data.map((item: T, index: number) => (
 
-              {data.map((item: User) => (
                 <tr
-                  key={item.ID}
-                  onMouseOver={() => setHovered(item.ID)}
-                  className= 'bg-white dark:bg-gray-800 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'>
+                  key={index}
+                  className={`${index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
+                    } border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600`}
+                >
                   <td className="w-4 p-4">
                     <div className="flex items-center">
                       <input
-                        id={`checkbox-table-search-${item.ID}`}
+                        id={`checkbox-${index}`}
                         type="checkbox"
-                        checked={(newData.find((user) => user.id === item.ID)?.isClicked || false) as boolean}
-                        onChange={() => {
-                          const updatedNewData = newData.map((user) =>
-                            user.id === item.ID
-                              ? { ...user, isClicked: !(user.isClicked || false) }
-                              : user
-                          );
-                          setNewData(updatedNewData);
-                          isCheckedAll && setCheckedAll(false);
-                        }}
+                        checked={checkedItems[index.toString()] || false}
+                        onChange={() => handleCheckboxChange(index)}
                       />
                       <label className="sr-only">checkbox</label>
                     </div>
                   </td>
                   {columns.map((column) => (
-                    <td className="px-6 py-4" key={column.key}>
-                      {(
-                        // Display the selected value for non-dropdown columns
-                        item[column.key as keyof User]
-                      )}
+                    <td key={column.key} className="px-6 py-4">
+                      {(item as never)[column.key]}
                     </td>
                   ))}
-                  <td className={`${isHovered === item.ID ? 'bg-gray-50 dark:bg-gray-600' : 'bg-white dark:bg-gray-800'
-                    } border-b dark:!border-gray-700 px-6 py-4 sticky right-0  border-gray-300  `}>
-                    <div className='flex gap-4 '>
-                      {(
-                        <button
-                          // onClick={()}
-                          className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                        >
+                  <td className="px-6 py-4 sticky right-0 border-b dark:!border-gray-700">
+                    <div className="flex gap-4">
+                      {onEdit && (
+                        <button onClick={() => onEdit(item)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
                           Edit
                         </button>
                       )}
-                      <button
-                        // onClick={()}
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      >
-                        visiblity
-                      </button>
-                      <button
-                        // onClick={() => handleDelete(item.ID)}
-                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                      >
-                        delete
-                      </button>
+                      {onDelete && (
+                        <button onClick={() => onDelete(item)} className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                          Delete
+                        </button>
+                      )}
                     </div>
-
-
                   </td>
-
                 </tr>
               ))}
-  
             </tbody>
           </table>
         </div>
       </div>
-      {/* <div className='flex w-full flex-row-reverse  items-end'>
+      <div className='flex w-full flex-row-reverse  items-end'>
         <Pagination currentPage={0} totalPages={0} onPageChange={function (page: number): void {
           throw new Error('Function not implemented.');
         }}></Pagination>
-      </div> */}
+      </div>
     </div>
   );
 }

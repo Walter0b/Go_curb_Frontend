@@ -12,11 +12,11 @@ export const Table = () => {
         { key: 'City', label: 'City' },
     ];
 
-    const handleEdit = (item) => {
+    const handleEdit = (item: unknown) => {
         console.log('Edit', item);
     };
 
-    const handleDelete = (item) => {
+    const handleDelete = (item: unknown) => {
         console.log('Delete', item);
     };
 

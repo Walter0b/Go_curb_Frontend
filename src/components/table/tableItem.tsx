@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import Pagination from './pagination';
+import { openModal } from '@store/actions';
+import { useDispatch } from 'react-redux';
 interface DataTableProps<T> {
   data: T[];
   columns: Column[];
@@ -10,10 +12,15 @@ interface Column {
   key: string;
   label: string;
 }
+
 export function TableItem<T>({ data, columns, onEdit, onDelete }: DataTableProps<T>) {
+  const dispatch = useDispatch();
   const [isCheckedAll, setCheckedAll] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
+const handleCloseModal = () => {
+  dispatch(openModal());
+};
 
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,13 +57,6 @@ export function TableItem<T>({ data, columns, onEdit, onDelete }: DataTableProps
 
 
 
-
-
-  const handleAddClick = () => {
-    console.log('handleAddClick')
-  };
-
-
   return (
     <div className='flex flex-col overscroll-none items-center p-12'>
 
@@ -82,7 +82,7 @@ export function TableItem<T>({ data, columns, onEdit, onDelete }: DataTableProps
             </button>
             {/* ... */}
             {/* Add Customer Button here */}
-            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" onClick={handleAddClick} className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
+            <button id="dropdownRadioButton" data-dropdown-toggle="dropdownRadio" onClick={handleCloseModal} className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700" type="button">
 
               Add Customer
 

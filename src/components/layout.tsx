@@ -16,7 +16,7 @@ function Layout() {
                 <div className="flex h-full">
                     <SideBare />
                     <main className="flex flex-col w-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black overflow-x-hidden overflow-y-auto mb-14">
-                        <ul className="circles h-full">
+                        <ul className=" pointer-events-none circles h-full">
                             {[...Array(12)].map((_, index) => (
                                 <li key={index}> </li>
                             ))}

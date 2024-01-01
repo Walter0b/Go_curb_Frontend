@@ -1,0 +1,13 @@
+/* Add this CSS class */
+.modal-enter {
+    transform: scaleY(0);
+    opacity: 0;
+    display: flex;
+  }
+  
+  .modal-enter-active {
+    transform: scaleY(1);
+    opacity: 1;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+  

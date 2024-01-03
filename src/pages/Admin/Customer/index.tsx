@@ -1,18 +1,17 @@
-// Customers.tsx
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useApiQuery } from "@api/api";
 import { apiEndpoints } from "@api/endpoints";
 import TableItem from "@components/table/tableItem";
 import { CustomerFields, CustomersColumns } from "@utils/models/customer/struc";
-import { FormData } from '@utils/models/struc';
+import { FetchData } from '@utils/models/struc';
 
-import { closeModal, openModal, setFormData } from '@store/actions';
+import { closeModal, openModal, setFetchData } from '@store/actions';
 import Modal from '@components/modal';
 
 interface DataTableState {
     isModalOpen: boolean;
-    formData: FormData;
+    formData: FetchData;
 }
 interface RootState {
     dataTable: DataTableState;
@@ -21,19 +20,19 @@ interface RootState {
 export default function Customers() {
     const dispatch = useDispatch();
     const isModalOpen = useSelector((state: RootState) => state.dataTable?.isModalOpen);
-    const formData = useSelector((state: RootState) => state.dataTable?.formData) ?? {} as FormData;
+    const formData = useSelector((state: RootState) => state.dataTable?.formData) ?? {} as FetchData;
     const authOverlayRef = React.useRef<HTMLDivElement>(null);
 
     // Fetch customers data
     const { data, isLoading } = useApiQuery({ endpoint: apiEndpoints.customers });
 
-    const handleEdit = (item: FormData) => {
-        dispatch(setFormData(item));
+    const handleEdit = (item: FetchData) => {
+        dispatch(setFetchData(item));
         dispatch(openModal());
     };
 
 
-    const handleDelete = (item: FormData) => {
+    const handleDelete = (item: FetchData) => {
         console.log('Delete', item);
     };
 
@@ -53,7 +52,7 @@ export default function Customers() {
                 isModalOpen={isModalOpen}
                 handleFormClick={handleCloseModal}
                 fields={CustomerFields}
-                formData={formData}  />
+                formData={formData} />
         </div>
     );
 }

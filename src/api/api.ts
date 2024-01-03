@@ -1,10 +1,7 @@
+import { FetchDataOptions } from '@utils/models/struc';
 import { useQuery } from 'react-query';
 
-interface FetchDataOptions {
-  endpoint: string;
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  body?: object;
-}
+
 
 export const fetchData = async ({ endpoint, method = 'GET', body }: FetchDataOptions) => {
   const baseEndpoint = import.meta.env.VITE_API_BASE_URL;

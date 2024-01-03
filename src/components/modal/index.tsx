@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import DynamicForm from "@components/modal/DynamicForm";
-import { FormData, FormField } from '@utils/models/struc';
+import { FetchData, FormField } from '@utils/models/struc';
 import gsap from 'gsap'
 interface ModalProps {
     authOverlayRef: React.RefObject<HTMLDivElement>;
     isModalOpen: boolean;
     handleFormClick: () => void;
     fields: FormField[];
-    formData: FormData;
+    formData: FetchData;
 }
 
 const Modal: React.FC<ModalProps> = ({ authOverlayRef, isModalOpen, handleFormClick, fields, formData }) => {
@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({ authOverlayRef, isModalOpen, handleFormCl
             <div className="modal-inner fixed inset-0 w-full h-full bg-black/40 " >
                 <div className="flex justify-center items-center h-full px-4 py-8">
                     <div className="modal-content" onClick={(event) => event.stopPropagation()}>
-                        <DynamicForm fields={fields} FormData={formData} />
+                        <DynamicForm fields={fields} FetchData={formData} />
                     </div>
                 </div>
             </div>

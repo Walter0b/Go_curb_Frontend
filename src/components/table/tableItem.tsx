@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Pagination from './pagination';
 import { openModal } from '@store/actions';
 import { useDispatch } from 'react-redux';
-interface DataTableProps<T> {
+interface DataTableProps<T extends { ID?: number }> {
   data: T[];
   columns: Column[];
   onEdit?: (item: T) => void;
@@ -13,14 +13,15 @@ interface Column {
   label: string;
 }
 
-export function TableItem<T>({ data, columns, onEdit, onDelete }: DataTableProps<T>) {
+export function TableItem<T extends { ID?: number }>({ data, columns, onEdit, onDelete }: DataTableProps<T>) {
   const dispatch = useDispatch();
   const [isCheckedAll, setCheckedAll] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+  const [checkedItemIds, setCheckedItemIds] = useState<number[] | undefined>();
 
-const handleCloseModal = () => {
-  dispatch(openModal());
-};
+  const handleCloseModal = () => {
+    dispatch(openModal());
+  };
 
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,14 +41,21 @@ const handleCloseModal = () => {
 
   const handleCheckboxChange = (index: number) => {
 
+
+
     const updatedCheckedItems = { ...checkedItems, [index.toString()]: !checkedItems[index.toString()] };
     setCheckedItems(updatedCheckedItems);
     console.log(updatedCheckedItems)
-    // Check if all individual checkboxes are checked
-    const allChecked = Object.values(updatedCheckedItems).every((isChecked) => isChecked);
-    !(Object.values(updatedCheckedItems).length == 1) && setCheckedAll(allChecked);
+    
+      const allChecked = Object.values(updatedCheckedItems).every((isChecked) => isChecked);
+      (Object.values(updatedCheckedItems).length === data.length) && setCheckedAll(allChecked);
+    
+      const checkedIds = Object.entries(updatedCheckedItems)
+        .filter(([, isChecked]) => isChecked)
+        .map(([index]) => data[parseInt(index, 10)].ID) as number[];
+    
+      setCheckedItemIds(checkedIds);
   };
-
 
 
 

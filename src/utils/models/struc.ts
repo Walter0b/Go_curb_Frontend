@@ -10,7 +10,14 @@ export interface FormField {
     span: number;
     options?: string[];
     autoComplete: string;
+    placeHolder?: string;
 }
-export interface FormData {
+export interface FetchData {
     [key: string]: string | null;
 }
+
+export interface FetchDataOptions {
+    endpoint: string;
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    body?: object;
+  }

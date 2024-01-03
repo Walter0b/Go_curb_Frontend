@@ -55,6 +55,7 @@ export function TableItem<T extends { ID?: number }>({ data, columns, onEdit, on
         .map(([index]) => data[parseInt(index, 10)].ID) as number[];
     
       setCheckedItemIds(checkedIds);
+      console.log(checkedItemIds)
   };
 
 
@@ -185,7 +186,7 @@ export function TableItem<T extends { ID?: number }>({ data, columns, onEdit, on
         </div>
       </div>
       <div className='flex w-full flex-row-reverse  items-end'>
-        <Pagination currentPage={0} totalPages={0} onPageChange={function (page: number): void {
+        <Pagination currentPage={0} totalPages={0} onPageChange={function (): void {
           throw new Error('Function not implemented.');
         }}></Pagination>
       </div>

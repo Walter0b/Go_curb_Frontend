@@ -1,50 +1,50 @@
 # React + TypeScript + Vite
 
-project-root/
-├── src/
-│   ├── components/
-│   │   ├── Table/
-│   │   │   ├── Table.tsx
-│   │   │   └── TableItem.tsx
-│   │   ├── Modal/
-│   │   │   ├── Modal.tsx
-│   │   │   └── Form.tsx
-│   │   └── ...
-│   ├── pages/
-│   │   ├── HomePage/
-│   │   │   ├── HomePage.tsx
-│   │   │   └── HomePage.css
-│   │   ├── TablePage/
-│   │   │   ├── TablePage.tsx
-│   │   │   └── TableContainer.tsx
-│   │   └── ...
-│   ├── api/
-│   │   ├── api.tsx
-│   │   └── endpoints.tsx
-│   ├── utils/
-│   │   ├── helpers.tsx
-│   │   └── ...
-│   ├── store/
-│   │   ├── actions/
-│   │   │   ├── tableActions.tsx
-│   │   │   └── ...
-│   │   ├── reducers/
-│   │   │   ├── tableReducer.tsx
-│   │   │   └── ...
-│   │   ├── store.tsx
-│   │   └── ...
-│   ├── styles/
-│   │   ├── tailwind.css
-│   │   └── ...
-│   ├── App.tsx
-│   ├── index.tsx
-│   └── index.css
-├── public/
-│   ├── index.html
-│   └── ...
-├── .gitignore
-├── package.tsxon
-└── README.md
+project-root/\
+├── src/\
+│ ├── components/\
+│ │ ├── Table/\
+│ │ │ ├── Table.tsx\
+│ │ │ └── TableItem.tsx\
+│ │ ├── Modal/\
+│ │ │ ├── Modal.tsx\
+│ │ │ └── Form.tsx\
+│ │ └── ...\
+│ ├── pages/\
+│ │ ├── HomePage/\
+│ │ │ ├── HomePage.tsx\
+│ │ │ └── HomePage.css\
+│ │ ├── TablePage/\
+│ │ │ ├── TablePage.tsx\
+│ │ │ └── TableContainer.tsx\
+│ │ └── ...\
+│ ├── api/\
+│ │ ├── api.tsx\
+│ │ └── endpoints.tsx\
+│ ├── utils/\
+│ │ ├── helpers.tsx\
+│ │ └── ...\
+│ ├── store/\
+│ │ ├── actions/\
+│ │ │ ├── tableActions.tsx\
+│ │ │ └── ...\
+│ │ ├── reducers/\
+│ │ │ ├── tableReducer.tsx\
+│ │ │ └── ...\
+│ │ ├── store.tsx\
+│ │ └── ...\
+│ ├── styles/\
+│ │ ├── tailwind.css\
+│ │ └── ...\
+│ ├── App.tsx\
+│ ├── index.tsx\
+│ └── index.css\
+├── public/\
+│ ├── index.html\
+│ └── ...\
+├── .gitignore\
+├── package.tsxon\
+└── README.md\
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

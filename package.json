@@ -13,6 +13,7 @@
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@reduxjs/toolkit": "^2.0.1",
+    "@rollup/rollup-linux-x64-gnu": "^4.9.2",
     "@types/redux-logger": "^3.0.12",
     "gsap": "^3.12.4",
     "localforage": "^1.10.0",

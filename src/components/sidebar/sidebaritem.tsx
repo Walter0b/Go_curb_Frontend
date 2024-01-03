@@ -21,7 +21,7 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function SideBareItems({ navigation, teams }: { navigation: NavigationItem[], teams: Team[] }) {
+export default function SideBareItems({ navigation, teams }: { navigation: NavigationItem[], teams?: Team[] }) {
     return (
         <ul role="list" className="flex flex-1 flex-col gap-y-7">
             <li>
@@ -53,7 +53,7 @@ export default function SideBareItems({ navigation, teams }: { navigation: Navig
             <li>
                 <div className="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
                 <ul role="list" className="-mx-2 mt-2 space-y-1">
-                    {teams.map((team: Team) => (
+                    {teams?.map((team: Team) => (
                         <li key={team.name}>
                             <a
                                 href={team.href}
